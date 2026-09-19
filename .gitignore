@@ -1,0 +1,38 @@
+# ---- build output -----------------------------------------------------------
+/build/
+/build-*/
+/dist/
+/out/
+*.o
+*.obj
+*.exe
+*.dll
+*.lib
+*.pdb
+*.ilk
+
+# ---- local tooling (installed on demand, never committed) -------------------
+/tools/node_modules/
+/tools/package-lock.json
+node_modules/
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# ---- generated screenshots / scratch artifacts ------------------------------
+/tools/shots/
+/shots/
+*.log
+
+# ---- IDE / OS ---------------------------------------------------------------
+.vscode/
+.idea/
+*.user
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ---- python theme generator produces these; they ARE committed -------------
+# (src/theme/generated and prototype/css/tokens.css are intentionally tracked -
+#  see docs/DESIGN.md, the generated files are the review surface)

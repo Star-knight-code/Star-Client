@@ -1,0 +1,130 @@
+name: Windows portable build
+
+# Builds Star Client for Windows and uploads a portable .zip.
+# Nothing is installed by the archive: unzip, run StarClient.exe, done.
+
+on:
+  push:
+    branches: [main, "arena/**"]
+    tags: ["v*"]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      qt_version:
+        description: Qt version to build against
+        default: "6.8.1"
+        required: false
+      publish:
+        description: Attach the zip to a draft release
+        type: boolean
+        default: false
+
+concurrency:
+  group: windows-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  QT_VERSION: ${{ github.event.inputs.qt_version || '6.8.1' }}
+  QT_MODULE: msvc2022_64
+  BUILD_TYPE: Release
+  VCPKG_BINARY_SOURCES: "clear;x-gha,readwrite"
+
+jobs:
+  build:
+    name: Build (windows x64)
+    runs-on: windows-2022
+    timeout-minutes: 90
+
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      # vcpkg binary caching through the Actions cache - saves ~20 minutes
+      - name: Export vcpkg cache variables
+        uses: actions/github-script@v7
+        with:
+          script: |
+            core.exportVariable('ACTIONS_CACHE_URL', process.env.ACTIONS_CACHE_URL || '');
+            core.exportVariable('ACTIONS_RUNTIME_TOKEN', process.env.ACTIONS_RUNTIME_TOKEN || '');
+
+      - name: Set up MSVC
+        uses: ilammy/msvc-dev-cmd@v1
+
+      - name: Install Qt ${{ env.QT_VERSION }}
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: ${{ env.QT_VERSION }}
+          arch: win64_msvc2022_64
+          modules: "qtimageformats"
+          cache: true
+
+      - name: Install build tools
+        shell: pwsh
+        run: |
+          choco install ninja --no-progress -y
+          echo "$env:VCPKG_INSTALLATION_ROOT" | Out-File -Append -Encoding utf8 $env:GITHUB_PATH
+          vcpkg version
+
+      - name: Configure
+        shell: pwsh
+        run: |
+          cmake -S . -B build -G Ninja `
+            -DCMAKE_BUILD_TYPE=$env:BUILD_TYPE `
+            -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_INSTALLATION_ROOT\scripts\buildsystems\vcpkg.cmake" `
+            -DCMAKE_PREFIX_PATH="$env:QT_ROOT_DIR" `
+            -DCMAKE_INSTALL_PREFIX="build/install" `
+            -DSTARCLIENT_BUILD_TESTS=OFF
+        env:
+          VCPKG_DEFAULT_TRIPLET: x64-windows
+
+      - name: Build
+        shell: pwsh
+        run: cmake --build build --config $env:BUILD_TYPE --parallel
+
+      - name: Stage the portable tree
+        shell: pwsh
+        run: |
+          ./scripts/package-portable.ps1 `
+            -BuildDir build `
+            -QtDir "$env:QT_ROOT_DIR" `
+            -Version "${{ github.ref_type == 'tag' && github.ref_name || format('{0}-{1}', 'dev', github.sha.Substring(0,7)) }}" `
+            -OutputDir dist
+
+      - name: Smoke test the archive
+        shell: pwsh
+        run: |
+          $zip = Get-ChildItem dist/*.zip | Select-Object -First 1
+          Write-Host "Archive: $($zip.Name) ($([math]::Round($zip.Length/1MB,1)) MB)"
+          Expand-Archive $zip.FullName -DestinationPath smoke -Force
+          $exe = Get-ChildItem -Recurse smoke -Filter StarClient.exe | Select-Object -First 1
+          if (-not $exe) { throw "StarClient.exe missing from the archive" }
+          Write-Host "Found $($exe.FullName)"
+          # --version must print and exit 0; a crash here fails the build
+          $out = & $exe.FullName --version 2>&1
+          Write-Host "Reported: $out"
+          if ($LASTEXITCODE -ne 0) { throw "StarClient.exe --version exited $LASTEXITCODE" }
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: StarClient-windows-x64-portable
+          path: dist/*.zip
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Attach to a draft release
+        if: ${{ github.event.inputs.publish == 'true' || startsWith(github.ref, 'refs/tags/v') }}
+        uses: softprops/action-gh-release@v2
+        with:
+          draft: true
+          files: dist/*.zip
+          name: "Star Client ${{ github.ref_name }}"
+          body: |
+            Portable Windows build. Unzip anywhere and run `StarClient.exe`.
+
+            Star Client is free software under the GNU GPL v3.0.
+            See CREDITS.md for attribution.

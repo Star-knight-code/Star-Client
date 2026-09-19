@@ -1,0 +1,662 @@
+/* ==========================================================================
+ * Star Client - Qt Widgets stylesheet template
+ * ==========================================================================
+ * This file is NOT used directly. tools/gen_theme.py resolves every
+ * double-brace token against theme/tokens.json and writes:
+ *     src/theme/generated/starclient-<theme>.qss
+ *
+ * Placeholder grammar (angle brackets are literal, never written bare in
+ * this file or the generator will try to resolve the example itself):
+ *     {{c.<colour-name>}}   {{a.<accent-name>}}   {{r.<radius>}}
+ *     {{s.<space-step>}}    {{f.<font-token>}}    {{m.<motion>}}
+ *     {{l.<layout-size>}}
+ *
+ * Qt stylesheets are a subset of CSS: no variables, no box-shadow,
+ * no transitions, no calc(). Everything is resolved up-front.
+ * ========================================================================== */
+
+/* --------------------------------------------------------------------------
+ * 1. Base + typography
+ * -------------------------------------------------------------------------- */
+QWidget {
+    background-color: {{c.bg-base}};
+    color: {{c.text-primary}};
+    font-family: {{f.family-ui}};
+    font-size: {{f.size-md}};
+    selection-background-color: {{a.accent}};
+    selection-color: {{c.accent-contrast}};
+    outline: 0;
+}
+
+QWidget[starRole="transparent"] { background: transparent; }
+QWidget[starRole="sunken"]      { background-color: {{c.bg-sunken}}; }
+QWidget[starRole="surface"]     { background-color: {{c.bg-surface}}; }
+QWidget[starRole="elevated"]    { background-color: {{c.bg-elevated}}; }
+
+QMainWindow::separator {
+    background-color: {{c.border-subtle}};
+    width: 1px;
+    height: 1px;
+}
+
+QFrame[starRole="divider"], QFrame[frameShape="4"], QFrame[frameShape="5"] {
+    background-color: {{c.border-subtle}};
+    border: 0;
+    max-height: 1px;
+}
+
+/* --------------------------------------------------------------------------
+ * 2. Cards, panels, group boxes
+ * -------------------------------------------------------------------------- */
+QFrame[starRole="card"], QGroupBox {
+    background-color: {{c.bg-card}};
+    border: 1px solid {{c.border-subtle}};
+    border-radius: {{r.lg}};
+}
+
+QFrame[starRole="card"][starInteractive="true"]:hover {
+    background-color: {{c.bg-card-hover}};
+    border-color: {{c.border}};
+}
+
+QFrame[starRole="card"][starSelected="true"] {
+    border-color: {{a.accent}};
+    background-color: {{c.bg-selected}};
+}
+
+QGroupBox {
+    margin-top: {{s.7}};
+    padding: {{s.5}};
+    font-weight: {{f.weight-semibold}};
+}
+
+QGroupBox::title {
+    subcontrol-origin: margin;
+    subcontrol-position: top left;
+    left: {{s.4}};
+    padding: 0 {{s.3}};
+    color: {{c.text-secondary}};
+    font-size: {{f.size-sm}};
+    font-weight: {{f.weight-semibold}};
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+}
+
+QLabel { background: transparent; }
+QLabel[starRole="h1"]       { font-size: {{f.size-3xl}}; font-weight: {{f.weight-bold}}; }
+QLabel[starRole="h2"]       { font-size: {{f.size-2xl}}; font-weight: {{f.weight-bold}}; }
+QLabel[starRole="h3"]       { font-size: {{f.size-xl}};  font-weight: {{f.weight-semibold}}; }
+QLabel[starRole="subtitle"] { font-size: {{f.size-lg}};  color: {{c.text-secondary}}; }
+QLabel[starRole="caption"]  { font-size: {{f.size-xs}};  color: {{c.text-muted}}; }
+QLabel[starRole="muted"]    { color: {{c.text-secondary}}; }
+QLabel[starRole="danger"]   { color: {{c.danger}}; }
+QLabel[starRole="success"]  { color: {{c.success}}; }
+QLabel[starRole="warning"]  { color: {{c.warning}}; }
+QLabel[starRole="accent"]   { color: {{a.accent}}; }
+QLabel[starRole="mono"]     { font-family: {{f.family-mono}}; font-size: {{f.size-sm}}; }
+QLabel:disabled             { color: {{c.text-disabled}}; }
+
+/* --------------------------------------------------------------------------
+ * 3. Buttons
+ * -------------------------------------------------------------------------- */
+QPushButton {
+    background-color: {{c.bg-card}};
+    color: {{c.text-primary}};
+    border: 1px solid {{c.border}};
+    border-radius: {{r.md}};
+    padding: {{s.3}} {{s.5}};
+    min-height: 20px;
+    font-weight: {{f.weight-medium}};
+}
+
+QPushButton:hover    { background-color: {{c.bg-hover}}; border-color: {{c.border-strong}}; }
+QPushButton:pressed  { background-color: {{c.bg-active}}; }
+QPushButton:disabled { background-color: {{c.bg-sunken}}; color: {{c.text-disabled}}; border-color: {{c.border-subtle}}; }
+QPushButton:checked  { background-color: {{c.bg-selected}}; border-color: {{a.accent}}; color: {{a.accent}}; }
+QPushButton:focus    { border-color: {{c.border-focus}}; }
+
+/* primary - the one call to action per screen */
+QPushButton[starRole="primary"] {
+    background-color: {{a.accent}};
+    color: {{c.accent-contrast}};
+    border: 1px solid {{a.accent}};
+    font-weight: {{f.weight-semibold}};
+    padding: {{s.3}} {{s.6}};
+}
+QPushButton[starRole="primary"]:hover   { background-color: {{a.accent-hover}}; border-color: {{a.accent-hover}}; }
+QPushButton[starRole="primary"]:pressed { background-color: {{a.accent-pressed}}; border-color: {{a.accent-pressed}}; }
+QPushButton[starRole="primary"]:disabled {
+    background-color: {{c.bg-skeleton}};
+    color: {{c.text-disabled}};
+    border-color: {{c.border-subtle}};
+}
+
+/* launch - the big hero action on the instance page.
+   NOTE: Qt stylesheets cannot express linear-gradient(). This is the closest
+   all-QSS approximation. Where the gradient really matters (the launch button
+   and the hero card) the C++ side uses a StarButton that paints a QLinearGradient
+   in paintEvent - see src/theme/StarButton.h. Keep both in sync. */
+QPushButton[starRole="launch"] {
+    background-color: {{a.accent}};
+    color: {{c.accent-contrast}};
+    border: 0;
+    border-radius: {{r.lg}};
+    padding: {{s.4}} {{s.8}};
+    font-size: {{f.size-lg}};
+    font-weight: {{f.weight-bold}};
+    letter-spacing: 0.3px;
+}
+QPushButton[starRole="launch"]:hover   { background-color: {{a.accent-hover}}; }
+QPushButton[starRole="launch"]:pressed { background-color: {{a.accent-pressed}}; }
+QPushButton[starRole="launch"]:disabled { background-color: {{c.bg-skeleton}}; color: {{c.text-disabled}}; }
+
+/* subtle / ghost */
+QPushButton[starRole="ghost"] {
+    background: transparent;
+    border: 1px solid transparent;
+    color: {{c.text-secondary}};
+}
+QPushButton[starRole="ghost"]:hover   { background-color: {{c.bg-hover}}; color: {{c.text-primary}}; }
+QPushButton[starRole="ghost"]:pressed { background-color: {{c.bg-active}}; }
+
+QPushButton[starRole="outline"] {
+    background: transparent;
+    border: 1px solid {{a.accent}};
+    color: {{a.accent}};
+}
+QPushButton[starRole="outline"]:hover { background-color: {{a.accent-soft}}; }
+
+QPushButton[starRole="danger"] {
+    background-color: {{c.danger-soft}};
+    border: 1px solid {{c.danger}};
+    color: {{c.danger}};
+}
+QPushButton[starRole="danger"]:hover { background-color: {{c.danger}}; color: {{c.accent-contrast}}; }
+
+QPushButton[starRole="pill"] { border-radius: {{r.pill}}; padding: {{s.2}} {{s.5}}; font-size: {{f.size-sm}}; }
+QPushButton[starRole="link"] {
+    background: transparent; border: 0; padding: 0 {{s.1}};
+    color: {{a.accent}}; text-decoration: underline;
+}
+QPushButton[starRole="link"]:hover { color: {{a.accent-hover}}; }
+
+QPushButton[starFlat="true"] { border-color: transparent; background: transparent; }
+
+QPushButton::menu-indicator { image: none; width: 0; }
+
+/* --------------------------------------------------------------------------
+ * 4. Tool buttons - the navigation rail and toolbars
+ * -------------------------------------------------------------------------- */
+QToolButton {
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: {{r.md}};
+    padding: {{s.3}};
+    color: {{c.text-secondary}};
+}
+QToolButton:hover    { background-color: {{c.bg-hover}}; color: {{c.text-primary}}; }
+QToolButton:pressed  { background-color: {{c.bg-active}}; }
+QToolButton:checked  { background-color: {{c.bg-selected}}; color: {{a.accent}}; border-color: {{c.border-subtle}}; }
+QToolButton:disabled { color: {{c.text-disabled}}; }
+QToolButton[starRole="primary"] { background-color: {{a.accent}}; color: {{c.accent-contrast}}; }
+QToolButton[starRole="primary"]:hover { background-color: {{a.accent-hover}}; }
+QToolButton[starRole="danger"]:hover  { background-color: {{c.danger-soft}}; color: {{c.danger}}; }
+QToolButton::menu-indicator { image: none; width: 0; }
+
+/* navigation rail */
+QToolBar#starNavRail, QToolBar[starRole="navrail"] {
+    background-color: {{c.bg-sidebar}};
+    border: 0;
+    border-right: 1px solid {{c.border-subtle}};
+    padding: {{s.3}} {{s.2}};
+    spacing: {{s.2}};
+}
+QToolBar#starNavRail QToolButton {
+    min-width: 44px;
+    min-height: 44px;
+    border-radius: {{r.md}};
+}
+QToolBar#starNavRail QToolButton:checked {
+    background-color: {{a.accent-soft}};
+    color: {{a.accent}};
+    border-left: 2px solid {{a.accent}};
+}
+
+QToolBar {
+    background-color: {{c.bg-surface}};
+    border: 0;
+    border-bottom: 1px solid {{c.border-subtle}};
+    padding: {{s.2}};
+    spacing: {{s.2}};
+}
+
+QToolBar::separator {
+    background-color: {{c.border-subtle}};
+    width: 1px;
+    margin: {{s.2}} {{s.3}};
+}
+
+/* --------------------------------------------------------------------------
+ * 5. Inputs
+ * -------------------------------------------------------------------------- */
+QLineEdit, QPlainTextEdit, QTextEdit, QSpinBox, QDoubleSpinBox, QDateEdit {
+    background-color: {{c.bg-input}};
+    color: {{c.text-primary}};
+    border: 1px solid {{c.border}};
+    border-radius: {{r.md}};
+    padding: {{s.3}} {{s.4}};
+    selection-background-color: {{a.accent}};
+}
+QLineEdit:hover, QPlainTextEdit:hover, QTextEdit:hover, QSpinBox:hover { border-color: {{c.border-strong}}; }
+QLineEdit:focus, QPlainTextEdit:focus, QTextEdit:focus, QSpinBox:focus, QDoubleSpinBox:focus {
+    border-color: {{c.border-focus}};
+    background-color: {{c.bg-card}};
+}
+QLineEdit:disabled, QPlainTextEdit:disabled, QTextEdit:disabled, QSpinBox:disabled {
+    color: {{c.text-disabled}};
+    background-color: {{c.bg-sunken}};
+}
+QLineEdit[starState="invalid"] { border-color: {{c.danger}}; }
+
+QLineEdit[starRole="search"] {
+    border-radius: {{r.pill}};
+    padding-left: {{s.6}};
+    background-color: {{c.bg-input}};
+}
+
+QSpinBox::up-button, QSpinBox::down-button,
+QDoubleSpinBox::up-button, QDoubleSpinBox::down-button {
+    background-color: transparent;
+    border: 0;
+    width: 16px;
+}
+QSpinBox::up-arrow, QDoubleSpinBox::up-arrow { image: url(:/starclient/icons/chevron-up.svg); width: 10px; height: 10px; }
+QSpinBox::down-arrow, QDoubleSpinBox::down-arrow { image: url(:/starclient/icons/chevron-down.svg); width: 10px; height: 10px; }
+
+QComboBox {
+    background-color: {{c.bg-input}};
+    color: {{c.text-primary}};
+    border: 1px solid {{c.border}};
+    border-radius: {{r.md}};
+    padding: {{s.3}} {{s.4}};
+    min-height: 20px;
+}
+QComboBox:hover { border-color: {{c.border-strong}}; background-color: {{c.bg-hover}}; }
+QComboBox:focus { border-color: {{c.border-focus}}; }
+QComboBox:disabled { color: {{c.text-disabled}}; background-color: {{c.bg-sunken}}; }
+QComboBox::drop-down { subcontrol-origin: padding; subcontrol-position: center right; width: 22px; border: 0; }
+QComboBox::down-arrow { image: url(:/starclient/icons/chevron-down.svg); width: 12px; height: 12px; }
+QComboBox QAbstractItemView {
+    background-color: {{c.bg-elevated}};
+    color: {{c.text-primary}};
+    border: 1px solid {{c.border}};
+    border-radius: {{r.md}};
+    padding: {{s.2}};
+    outline: 0;
+}
+
+/* --------------------------------------------------------------------------
+ * 6. Checkboxes, radios, switches, sliders
+ * -------------------------------------------------------------------------- */
+QCheckBox, QRadioButton { spacing: {{s.3}}; color: {{c.text-primary}}; background: transparent; }
+QCheckBox:disabled, QRadioButton:disabled { color: {{c.text-disabled}}; }
+
+QCheckBox::indicator, QGroupBox::indicator {
+    width: 17px; height: 17px;
+    border: 1px solid {{c.border-strong}};
+    border-radius: {{r.xs}};
+    background-color: {{c.bg-input}};
+}
+QCheckBox::indicator:hover, QGroupBox::indicator:hover { border-color: {{a.accent}}; }
+QCheckBox::indicator:checked, QGroupBox::indicator:checked {
+    background-color: {{a.accent}};
+    border-color: {{a.accent}};
+    image: url(:/starclient/icons/check.svg);
+}
+QCheckBox::indicator:disabled { background-color: {{c.bg-sunken}}; border-color: {{c.border-subtle}}; }
+
+QRadioButton::indicator {
+    width: 17px; height: 17px;
+    border: 1px solid {{c.border-strong}};
+    border-radius: 9px;
+    background-color: {{c.bg-input}};
+}
+QRadioButton::indicator:checked {
+    border: 5px solid {{a.accent}};
+    background-color: {{c.bg-surface}};
+}
+
+/* toggle switch - starRole="switch" on a QCheckBox
+   Qt stylesheets have no ::after, so the knob is a positioned image on the
+   indicator itself. Qt keeps an image anchored to the indicator's corner,
+   which is exactly the sliding knob we want. */
+QCheckBox[starRole="switch"] { spacing: {{s.4}}; }
+QCheckBox[starRole="switch"]::indicator {
+    width: 38px; height: 21px;
+    border-radius: 11px;
+    border: 1px solid {{c.border-strong}};
+    background-color: {{c.bg-input}};
+    image: url(:/starclient/icons/switch-knob.svg);
+}
+QCheckBox[starRole="switch"]::indicator:hover { border-color: {{a.accent}}; }
+QCheckBox[starRole="switch"]::indicator:checked {
+    background-color: {{a.accent}};
+    border-color: {{a.accent}};
+    image: url(:/starclient/icons/switch-knob-on.svg);
+}
+QCheckBox[starRole="switch"]:disabled::indicator {
+    background-color: {{c.bg-sunken}};
+    border-color: {{c.border-subtle}};
+}
+
+QSlider::groove:horizontal {
+    height: 6px;
+    background-color: {{c.bg-skeleton}};
+    border-radius: 3px;
+}
+QSlider::sub-page:horizontal {
+    background-color: {{a.accent}};
+    border-radius: 3px;
+}
+QSlider::handle:horizontal {
+    background-color: {{c.bg-surface}};
+    border: 2px solid {{a.accent}};
+    width: 14px;
+    height: 14px;
+    margin: -5px 0;
+    border-radius: 9px;
+}
+QSlider::handle:horizontal:hover { background-color: {{a.accent-hover}}; border-color: {{a.accent-hover}}; }
+QSlider:disabled::sub-page:horizontal { background-color: {{c.border-strong}}; }
+QSlider:disabled::handle:horizontal { border-color: {{c.border-strong}}; }
+QSlider::groove:vertical { width: 6px; background-color: {{c.bg-skeleton}}; border-radius: 3px; }
+QSlider::sub-page:vertical { background-color: {{a.accent}}; border-radius: 3px; }
+QSlider::handle:vertical {
+    background-color: {{c.bg-surface}};
+    border: 2px solid {{a.accent}};
+    width: 14px; height: 14px; margin: 0 -5px; border-radius: 9px;
+}
+
+/* the RAM slider gets a wider hit area */
+QSlider[starRole="ram"]::groove:horizontal { height: 8px; border-radius: 4px; }
+QSlider[starRole="ram"]::handle:horizontal { width: 18px; height: 18px; margin: -6px 0; border-radius: 10px; }
+
+/* --------------------------------------------------------------------------
+ * 7. Item views, lists, trees, tables
+ * -------------------------------------------------------------------------- */
+QAbstractItemView {
+    background-color: {{c.bg-surface}};
+    alternate-background-color: {{c.bg-card}};
+    border: 1px solid {{c.border-subtle}};
+    border-radius: {{r.md}};
+    outline: 0;
+    padding: {{s.2}};
+    selection-background-color: {{c.bg-selected}};
+    selection-color: {{c.text-primary}};
+}
+QAbstractItemView::item {
+    padding: {{s.3}} {{s.4}};
+    border-radius: {{r.sm}};
+    min-height: 22px;
+}
+QAbstractItemView::item:hover    { background-color: {{c.bg-hover}}; }
+QAbstractItemView::item:selected { background-color: {{c.bg-selected}}; color: {{c.text-primary}}; }
+QAbstractItemView::item:selected:active { background-color: {{a.accent-soft-strong}}; }
+QAbstractItemView:disabled { color: {{c.text-disabled}}; }
+
+QListView, QTreeView, QTableView { show-decoration-selected: 1; }
+QTreeView::branch { background: transparent; }
+
+/* instance grid */
+QListView#starInstanceGrid { background: transparent; border: 0; padding: 0; }
+QListView#starInstanceGrid::item {
+    background-color: {{c.bg-card}};
+    border: 1px solid {{c.border-subtle}};
+    border-radius: {{r.lg}};
+    margin: {{s.3}};
+    padding: {{s.5}};
+}
+QListView#starInstanceGrid::item:hover {
+    background-color: {{c.bg-card-hover}};
+    border-color: {{c.border}};
+}
+QListView#starInstanceGrid::item:selected {
+    border-color: {{a.accent}};
+    background-color: {{c.bg-selected}};
+}
+
+/* sidebar trees */
+QTreeView#starSidebar, QListView#starSidebar {
+    background-color: {{c.bg-sidebar}};
+    border: 0;
+    border-radius: 0;
+    padding: {{s.3}};
+}
+QTreeView#starSidebar::item, QListView#starSidebar::item {
+    padding: {{s.3}} {{s.4}};
+    border-radius: {{r.md}};
+    color: {{c.text-secondary}};
+}
+QTreeView#starSidebar::item:hover, QListView#starSidebar::item:hover {
+    background-color: {{c.bg-hover}}; color: {{c.text-primary}};
+}
+QTreeView#starSidebar::item:selected, QListView#starSidebar::item:selected {
+    background-color: {{a.accent-soft}}; color: {{a.accent}};
+}
+
+QHeaderView::section {
+    background-color: {{c.bg-surface}};
+    color: {{c.text-muted}};
+    border: 0;
+    border-bottom: 1px solid {{c.border-subtle}};
+    padding: {{s.3}} {{s.4}};
+    font-size: {{f.size-xs}};
+    font-weight: {{f.weight-semibold}};
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+QHeaderView::section:hover { color: {{c.text-primary}}; }
+QTableCornerButton::section { background-color: {{c.bg-surface}}; border: 0; }
+QHeaderView::down-arrow { image: url(:/starclient/icons/chevron-down.svg); width: 10px; height: 10px; }
+QHeaderView::up-arrow   { image: url(:/starclient/icons/chevron-up.svg);   width: 10px; height: 10px; }
+
+/* --------------------------------------------------------------------------
+ * 8. Tabs - instance page sections
+ * -------------------------------------------------------------------------- */
+QTabWidget::pane {
+    background-color: {{c.bg-surface}};
+    border: 0;
+    border-top: 1px solid {{c.border-subtle}};
+    top: -1px;
+}
+QTabBar { background: transparent; qproperty-drawBase: 0; }
+QTabBar::tab {
+    background: transparent;
+    color: {{c.text-secondary}};
+    border: 0;
+    border-bottom: 2px solid transparent;
+    padding: {{s.4}} {{s.5}};
+    margin-right: {{s.2}};
+    font-weight: {{f.weight-medium}};
+}
+QTabBar::tab:hover { color: {{c.text-primary}}; background-color: {{c.bg-hover}}; }
+QTabBar::tab:selected {
+    color: {{a.accent}};
+    border-bottom: 2px solid {{a.accent}};
+    font-weight: {{f.weight-semibold}};
+}
+QTabBar::tab:disabled { color: {{c.text-disabled}}; }
+QTabBar::close-button { image: url(:/starclient/icons/close.svg); subcontrol-position: right; }
+
+/* settings sections rendered as a vertical list instead of tabs */
+QTabWidget[starRole="settings"] QTabBar::tab {
+    border-bottom: 0;
+    border-left: 2px solid transparent;
+    border-radius: {{r.md}};
+    text-align: left;
+    min-width: {{l.sidebar-width}};
+}
+QTabWidget[starRole="settings"] QTabBar::tab:selected {
+    background-color: {{a.accent-soft}};
+    border-left: 2px solid {{a.accent}};
+}
+
+/* --------------------------------------------------------------------------
+ * 9. Menus, tooltips, dialogs, overlays
+ * -------------------------------------------------------------------------- */
+QMenuBar {
+    background-color: {{c.bg-titlebar}};
+    color: {{c.text-secondary}};
+    border-bottom: 1px solid {{c.border-subtle}};
+    padding: {{s.1}} {{s.2}};
+}
+QMenuBar::item { background: transparent; padding: {{s.2}} {{s.4}}; border-radius: {{r.sm}}; }
+QMenuBar::item:selected { background-color: {{c.bg-hover}}; color: {{c.text-primary}}; }
+
+QMenu {
+    background-color: {{c.bg-elevated}};
+    border: 1px solid {{c.border}};
+    border-radius: {{r.md}};
+    padding: {{s.2}};
+}
+QMenu::item {
+    padding: {{s.3}} {{s.6}} {{s.3}} {{s.5}};
+    border-radius: {{r.sm}};
+    color: {{c.text-primary}};
+}
+QMenu::item:selected { background-color: {{c.bg-hover}}; }
+QMenu::item:disabled { color: {{c.text-disabled}}; }
+QMenu::separator { height: 1px; background-color: {{c.border-subtle}}; margin: {{s.2}} {{s.3}}; }
+QMenu::icon { padding-left: {{s.3}}; }
+QMenu::indicator { width: 16px; height: 16px; }
+
+QToolTip {
+    background-color: {{c.bg-elevated}};
+    color: {{c.text-primary}};
+    border: 1px solid {{c.border-strong}};
+    border-radius: {{r.sm}};
+    padding: {{s.2}} {{s.3}};
+}
+
+QDialog, QWizard, QMessageBox {
+    background-color: {{c.bg-base}};
+    border: 1px solid {{c.border-subtle}};
+    border-radius: {{r.lg}};
+}
+QWizard::title { background: transparent; }
+QDialogButtonBox { button-layout: 1; }
+
+QProgressBar {
+    background-color: {{c.bg-skeleton}};
+    border: 0;
+    border-radius: {{r.pill}};
+    height: 8px;
+    text-align: center;
+    color: {{c.text-secondary}};
+    font-size: {{f.size-xs}};
+}
+QProgressBar::chunk {
+    background-color: {{a.accent}};
+    border-radius: {{r.pill}};
+}
+QProgressBar[starRole="success"]::chunk { background-color: {{c.success}}; }
+
+QStatusBar {
+    background-color: {{c.bg-surface}};
+    color: {{c.text-muted}};
+    border-top: 1px solid {{c.border-subtle}};
+}
+QStatusBar::item { border: 0; }
+
+QSplitter::handle { background-color: {{c.border-subtle}}; }
+QSplitter::handle:horizontal { width: 1px; }
+QSplitter::handle:vertical { height: 1px; }
+QSplitter::handle:hover { background-color: {{a.accent}}; }
+
+QDockWidget {
+    titlebar-close-icon: url(:/starclient/icons/close.svg);
+    titlebar-normal-icon: url(:/starclient/icons/restore.svg);
+    color: {{c.text-secondary}};
+}
+QDockWidget::title {
+    background-color: {{c.bg-surface}};
+    padding: {{s.3}};
+    border-bottom: 1px solid {{c.border-subtle}};
+}
+
+/* --------------------------------------------------------------------------
+ * 10. Scrollbars
+ * -------------------------------------------------------------------------- */
+QScrollBar:vertical {
+    background: transparent;
+    width: 12px;
+    margin: 0;
+}
+QScrollBar::handle:vertical {
+    background-color: {{c.scrollbar-thumb}};
+    min-height: 36px;
+    border-radius: 5px;
+    margin: 2px;
+}
+QScrollBar::handle:vertical:hover { background-color: {{c.scrollbar-thumb-hover}}; }
+QScrollBar:horizontal {
+    background: transparent;
+    height: 12px;
+    margin: 0;
+}
+QScrollBar::handle:horizontal {
+    background-color: {{c.scrollbar-thumb}};
+    min-width: 36px;
+    border-radius: 5px;
+    margin: 2px;
+}
+QScrollBar::handle:horizontal:hover { background-color: {{c.scrollbar-thumb-hover}}; }
+QScrollBar::add-line, QScrollBar::sub-line { height: 0; width: 0; border: 0; background: none; }
+QScrollBar::add-page, QScrollBar::sub-page { background: none; }
+QScrollArea { background: transparent; border: 0; }
+QAbstractScrollArea::corner { background: transparent; }
+
+/* --------------------------------------------------------------------------
+ * 11. Dialogs / notifications used by Star Client itself
+ * -------------------------------------------------------------------------- */
+QFrame#starToast {
+    background-color: {{c.bg-elevated}};
+    border: 1px solid {{c.border}};
+    border-radius: {{r.md}};
+    padding: {{s.4}};
+}
+QFrame#starBanner {
+    background-color: {{a.accent-soft}};
+    border: 1px solid {{a.accent}};
+    border-radius: {{r.md}};
+    padding: {{s.4}};
+}
+QFrame#starBanner[starState="warning"] { background-color: {{c.warning-soft}}; border-color: {{c.warning}}; }
+QFrame#starBanner[starState="danger"]  { background-color: {{c.danger-soft}};  border-color: {{c.danger}}; }
+QFrame#starBanner[starState="success"] { background-color: {{c.success-soft}}; border-color: {{c.success}}; }
+
+/* badges - version, loader, java, mod count */
+QLabel[starRole="badge"] {
+    background-color: {{c.bg-hover}};
+    color: {{c.text-secondary}};
+    border-radius: {{r.pill}};
+    padding: {{s.1}} {{s.3}};
+    font-size: {{f.size-xs}};
+    font-weight: {{f.weight-medium}};
+}
+QLabel[starRole="badge"][starState="accent"]  { background-color: {{a.accent-soft}};  color: {{a.accent}}; }
+QLabel[starRole="badge"][starState="success"] { background-color: {{c.success-soft}}; color: {{c.success}}; }
+QLabel[starRole="badge"][starState="warning"] { background-color: {{c.warning-soft}}; color: {{c.warning}}; }
+QLabel[starRole="badge"][starState="danger"]  { background-color: {{c.danger-soft}};  color: {{c.danger}}; }
+
+/* navigation highlight bar used by the settings list */
+QFrame[starRole="navitem"] {
+    border-radius: {{r.md}};
+    padding: {{s.3}} {{s.4}};
+    background: transparent;
+}
+QFrame[starRole="navitem"]:hover { background-color: {{c.bg-hover}}; }
+QFrame[starRole="navitem"][starSelected="true"] {
+    background-color: {{a.accent-soft}};
+    border-left: 2px solid {{a.accent}};
+}
