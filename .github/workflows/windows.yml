@@ -130,7 +130,11 @@ jobs:
 
       - name: Rename artifacts to Star Client names
         shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
+          # A failure here is invisible in the job log, so report it explicitly.
+          try {
           $version = "${{ inputs.version }}"
           if (-not $version) {
             # a tag like v0.1.0 names the release, otherwise fall back to the commit
@@ -138,18 +142,21 @@ jobs:
           }
           Write-Host "packaging version: $version"
 
+          # the archives are written into dist/, which does not exist yet
+          New-Item -ItemType Directory -Path dist -Force | Out-Null
+
           # portable zip -> StarClient-<version>-windows-x64-portable.zip
-          $portable = Get-ChildItem -Path install-portable -Recurse -File -ErrorAction SilentlyContinue
-          if ($portable) {
-            Compress-Archive -Path install-portable/* `
-              -DestinationPath "dist/StarClient-$version-windows-x64-portable.zip" -Force
-            Write-Host "portable archive written"
-          } else {
+          if (-not (Test-Path install-portable)) {
             Write-Warning "no install-portable tree found"
+          } elseif (-not (Get-ChildItem -Path install-portable -Recurse -File -ErrorAction SilentlyContinue)) {
+            Write-Warning "install-portable is empty"
+          } else {
+            Compress-Archive -Path install-portable/* `
+              -DestinationPath "dist/StarClient-$version-windows-x64-portable.zip" -Force -ErrorAction Stop
+            Write-Host "portable archive written"
           }
 
           # NSIS installer -> StarClient-<version>-windows-x64-setup.exe
-          New-Item -ItemType Directory -Path dist -Force | Out-Null
           $installer = Get-ChildItem -Path . -Filter "*-Setup.exe" -File -ErrorAction SilentlyContinue |
                        Select-Object -First 1
           if ($installer) {
@@ -157,6 +164,17 @@ jobs:
             Write-Host "installer copied: $($installer.Name)"
           } else {
             Write-Warning "no installer exe found (NSIS may not have run)"
+          }
+          } catch {
+            $message = $_ | Out-String
+            Write-Host $message
+            $escaped = $message.Replace('%', '%25').Replace("`r", '').Replace("`n", '%0A')
+            if ($escaped.Length -gt 600) { $escaped = $escaped.Substring(0, 600) }
+            Write-Host "::error title=Packaging failed::$escaped"
+            $message | Out-File -FilePath packaging-error.md -Encoding utf8
+            gh api -X POST "repos/$env:GITHUB_REPOSITORY/commits/$env:GITHUB_SHA/comments" `
+              -F body=@packaging-error.md
+            throw
           }
 
       - name: Verify the archives

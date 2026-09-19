@@ -113,7 +113,7 @@ symlinkJoin {
       ++ additionalPrograms;
 
     in
-    [ "--prefix PRISMLAUNCHER_JAVA_PATHS : ${lib.makeSearchPath "bin/java" jdks}" ]
+    [ "--prefix STARCLIENT_JAVA_PATHS : ${lib.makeSearchPath "bin/java" jdks}" ]
     ++ lib.optionals stdenv.hostPlatform.isLinux [
       "--set LD_LIBRARY_PATH ${addDriverRunpath.driverLink}/lib:${lib.makeLibraryPath runtimeLibs}"
       "--prefix PATH : ${lib.makeBinPath runtimePrograms}"

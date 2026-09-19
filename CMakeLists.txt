@@ -179,16 +179,16 @@ set(Launcher_LOGIN_CALLBACK_URL "https://prismlauncher.org/successful-login" CAC
 set(Launcher_LEGACY_FMLLIBS_BASE_URL "https://files.prismlauncher.org/fmllibs/" CACHE STRING "URL for legacy (<=1.5.2) FML Libraries.")
 
 ######## Set version numbers ########
-set(Launcher_VERSION_MAJOR 11)
-set(Launcher_VERSION_MINOR 0)
-set(Launcher_VERSION_PATCH 3)
+set(Launcher_VERSION_MAJOR 0)
+set(Launcher_VERSION_MINOR 1)
+set(Launcher_VERSION_PATCH 0)
 set(Launcher_VERSION_BUILD 0)
 
-if(DEFINED ENV{PRISMLAUNCHER_VERSION} AND NOT "$ENV{PRISMLAUNCHER_VERSION}" STREQUAL "")
+if(DEFINED ENV{STARCLIENT_VERSION} AND NOT "$ENV{STARCLIENT_VERSION}" STREQUAL "")
     set(Launcher_VERSION_OVERRIDE "$ENV{STARCLIENT_VERSION}")
     string(REGEX MATCH "^([0-9]+)\\.([0-9]+)\\.([0-9]+)(\\.([0-9]+))?$" _Launcher_VERSION_MATCH "${Launcher_VERSION_OVERRIDE}")
     if(NOT _Launcher_VERSION_MATCH)
-        message(FATAL_ERROR "PRISMLAUNCHER_VERSION must be MAJOR.MINOR.PATCH or MAJOR.MINOR.PATCH.BUILD")
+        message(FATAL_ERROR "STARCLIENT_VERSION must be MAJOR.MINOR.PATCH or MAJOR.MINOR.PATCH.BUILD")
     endif()
 
     set(Launcher_VERSION_MAJOR "${CMAKE_MATCH_1}")

@@ -102,7 +102,7 @@ jobs:
       BUILD_PLATFORM: official
       BUILD_TYPE: ${{ inputs.build-type || 'Debug' }}
       CMAKE_PRESET: ${{ matrix.cmake-preset }}
-      PRISMLAUNCHER_VERSION: ${{ inputs.version || '' }}
+      STARCLIENT_VERSION: ${{ inputs.version || '' }}
 
       MACOSX_DEPLOYMENT_TARGET: ${{ matrix.macosx-deployment-target }}
 
