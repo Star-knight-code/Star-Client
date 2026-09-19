@@ -72,6 +72,49 @@ jobs:
         shell: pwsh
         run: cmake --build --preset "$env:CMAKE_PRESET" --config "$env:BUILD_TYPE"
 
+      # CI logs are not always retrievable from outside, so a failed build
+      # re-runs the build to capture the compiler diagnostics, surfaces them as
+      # workflow annotations and attaches the full text to the commit.
+      - name: Report build failure
+        if: failure()
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set +e
+          cmake --build --preset "$CMAKE_PRESET" --config "$BUILD_TYPE" > build-output.log 2>&1
+          echo "rebuild exited with $?"
+
+          {
+            echo '### Build failure diagnostics'
+            echo
+            echo '```'
+            grep -n -iE 'error|fatal' build-output.log | head -80
+            echo '```'
+            echo
+            echo '<details><summary>Last 120 lines</summary>'
+            echo
+            echo '```'
+            tail -120 build-output.log
+            echo '```'
+            echo '</details>'
+          } > build-diagnostics.md
+
+          head -c 60000 build-diagnostics.md > build-diagnostics.small.md
+          gh api -X POST "repos/${GITHUB_REPOSITORY}/commits/${GITHUB_SHA}/comments" \
+            -F body=@build-diagnostics.small.md || echo "could not attach the log to the commit"
+
+          start=$(grep -n -iE 'error' build-output.log | head -1 | cut -d: -f1)
+          if [ -n "$start" ]; then
+            end=$((start + 12))
+            block=$(sed -n "${start},${end}p" build-output.log)
+            block=${block//'%'/'%25'}
+            block=${block//$'\r'/}
+            block=${block//$'\n'/'%0A'}
+            echo "::error title=Windows build failure::${block}"
+          fi
+          grep -n -iE 'error' build-output.log | tail -5
+
       # The upstream packaging action handles the install tree, windeployqt,
       # the portable component and the NSIS installer. Signing steps are
       # guarded on secrets we do not have, so they are skipped cleanly.
