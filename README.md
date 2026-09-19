@@ -57,6 +57,27 @@ that is white on dark themes and ink on the light theme.
 
 ---
 
+## Screens
+
+Browser prototype (`prototype/`):
+
+| OLED Black | Daylight | Quick Start |
+| --- | --- | --- |
+| ![Star Start, OLED](docs/screenshots/prototype-oled-star-start.png) | ![Star Start, light](docs/screenshots/prototype-light-star-start.png) | ![Setup wizard](docs/screenshots/prototype-quick-start.png) |
+
+The same design rendered by **real Qt Widgets**, styled by the generated QSS
+(`prototype/qt/`) — proof that the design ports to the launcher without
+compromise:
+
+| Qt · OLED Black | Qt · Daylight |
+| --- | --- |
+| ![Qt, OLED](docs/screenshots/qt-oled-star-start.png) | ![Qt, light](docs/screenshots/qt-light-star-start.png) |
+
+See [`docs/DESIGN.md`](docs/DESIGN.md) for what QSS covers natively, what it
+cannot express, and the pattern used for each gap.
+
+---
+
 ## Layout
 
 ```
