@@ -66,11 +66,11 @@ jobs:
 
       - name: Configure
         shell: pwsh
-        run: cmake --preset $env:CMAKE_PRESET -DCMAKE_BUILD_TYPE=$env:BUILD_TYPE
+        run: cmake --preset "$env:CMAKE_PRESET"
 
       - name: Build
         shell: pwsh
-        run: cmake --build build --config $env:BUILD_TYPE --parallel
+        run: cmake --build --preset "$env:CMAKE_PRESET" --config "$env:BUILD_TYPE"
 
       # The upstream packaging action handles the install tree, windeployqt,
       # the portable component and the NSIS installer. Signing steps are
