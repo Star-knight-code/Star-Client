@@ -24,6 +24,7 @@ venv/
 /tools/shots/
 /shots/
 *.log
+!tests/testdata/**/*.log
 
 # ---- IDE / OS ---------------------------------------------------------------
 .vscode/
