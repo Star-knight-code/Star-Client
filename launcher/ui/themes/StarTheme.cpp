@@ -21,6 +21,7 @@
 #include <QObject>
 
 #include "Application.h"
+#include "settings/SettingsObject.h"
 
 namespace {
 
