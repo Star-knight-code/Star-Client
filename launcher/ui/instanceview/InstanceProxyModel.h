@@ -26,6 +26,8 @@ class InstanceProxyModel : public QSortFilterProxyModel {
 
    protected:
     QVariant data(const QModelIndex& index, int role) const override;
+    /// Groups show their children when the group matches; empty groups are cut.
+    bool filterAcceptsRow(int source_row, const QModelIndex& source_parent) const override;
     bool lessThan(const QModelIndex& left, const QModelIndex& right) const override;
     bool subSortLessThan(const QModelIndex& left, const QModelIndex& right) const;
 

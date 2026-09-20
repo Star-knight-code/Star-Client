@@ -25,7 +25,7 @@ QWidget[starRole="sunken"]      { background-color: #08080C; }
 QWidget[starRole="surface"]     { background-color: #111117; }
 QWidget[starRole="elevated"]    { background-color: #1B1B23; }
 
-QMainWindow, QWizard, QDialog {
+QMainWindow, QWizard, QDialog, QStackedWidget {
     background-color: #0C0C11;
 }
 
@@ -198,6 +198,16 @@ QToolButton[starRole="primary"] { background-color: #7C6BFF; color: #FFFFFF; }
 QToolButton[starRole="primary"]:hover { background-color: #9083FF; }
 QToolButton[starRole="danger"]:hover  { background-color: rgba(255,92,108,0.16); color: #FF5C6C; }
 QToolButton::menu-indicator { image: none; width: 0; }
+
+/* back off an Install or Edit page */
+QToolButton#starBack {
+    background: transparent;
+    border: 1px solid #1E1E27;
+    border-radius: 10px;
+    padding: 4px;
+    color: #A2A6B5;
+}
+QToolButton#starBack:hover { background-color: #22222C; color: #EEF0F6; }
 
 /* navigation rail */
 QToolBar#starNavRail, QToolBar[starRole="navrail"] {

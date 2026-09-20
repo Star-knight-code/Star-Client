@@ -874,6 +874,12 @@ SET(LAUNCHER_SOURCES
     ui/themes/StarTheme.h
     ui/StarNavRail.cpp
     ui/StarNavRail.h
+    ui/StarPage.cpp
+    ui/StarPage.h
+    ui/StarShell.cpp
+    ui/StarShell.h
+    ui/views/StarPlaceholderView.cpp
+    ui/views/StarPlaceholderView.h
     ui/themes/ITheme.cpp
     ui/themes/ITheme.h
     ui/themes/HintOverrideProxyStyle.cpp

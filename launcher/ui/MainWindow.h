@@ -62,6 +62,8 @@ class KonamiCode;
 class InstanceTask;
 class LabeledToolButton;
 class StarNavRail;
+class StarShell;
+class StarPage;
 
 namespace Ui {
 class MainWindow;
@@ -185,6 +187,15 @@ class MainWindow : public QMainWindow {
 
     /// Opens the Star Start page, the landing view of the rail.
     void showStarStartPage();
+    void showStarInstancesPage();
+    void showStarBrowsePage();
+    void showStarAccountsPage();
+    void showStarSettingsPage();
+
+    /// Filters the instance grid from the title strip's search box.
+    void setInstanceSearchTerm(const QString& term);
+    /// Keeps the account caption in the title strip honest.
+    void updateShellAccountCaption();
     /// Steps through the three Star Client themes.
     void cycleTheme();
 
@@ -241,6 +252,8 @@ class MainWindow : public QMainWindow {
     // these are managed by Qt's memory management model!
     InstanceView* view = nullptr;
     StarNavRail* m_navRail = nullptr;
+    StarShell* m_shell = nullptr;
+    StarPage* m_activePage = nullptr;
     InstanceProxyModel* proxymodel = nullptr;
     QToolButton* newsLabel = nullptr;
     QLabel* m_statusLeft = nullptr;

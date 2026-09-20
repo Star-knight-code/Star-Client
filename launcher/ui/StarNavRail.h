@@ -40,7 +40,7 @@ class StarNavRail : public QToolBar {
 
    public:
     /// The destinations the rail can point at.
-    enum class Page { Start, Instances, Browse, Accounts, Settings };
+    enum class Page { Start, Instances, Browse, Accounts, Edit, Settings };
 
     explicit StarNavRail(QWidget* parent = nullptr);
 

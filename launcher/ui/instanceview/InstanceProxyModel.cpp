@@ -30,6 +30,44 @@ InstanceProxyModel::InstanceProxyModel(QObject* parent) : QSortFilterProxyModel(
     m_naturalSort.setLocale(QLocale::system());
 }
 
+bool InstanceProxyModel::filterAcceptsRow(int source_row, const QModelIndex& source_parent) const
+{
+    const QModelIndex idx = sourceModel()->index(source_row, 0, source_parent);
+    if (!idx.isValid()) {
+        return false;
+    }
+    const QRegularExpression needle = filterRegularExpression();
+    if (needle.pattern().isEmpty()) {
+        return true;
+    }
+
+    const auto matches = [&](const QModelIndex& at) {
+        return at.data().toString().contains(needle);
+    };
+
+    const int chrome = sourceModel()->rowCount(idx);
+    if (chrome > 0) {
+        // a group shows when its own name matches, or when any descendent does
+        if (matches(idx)) {
+            return true;
+        }
+        for (int row = 0; row < chrome; ++row) {
+            const QModelIndex child = sourceModel()->index(row, 0, idx);
+            if (matches(child) && sourceModel()->rowCount(child) == 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+    // a leaf instance: match its name, or the group it sits in
+    if (matches(idx)) {
+        return true;
+    }
+    if (source_parent.isValid() && matches(source_parent)) {
+        return true;
+    }
+    return false;
+}
 QVariant InstanceProxyModel::data(const QModelIndex& index, int role) const
 {
     QVariant data = QSortFilterProxyModel::data(index, role);

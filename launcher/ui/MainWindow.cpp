@@ -108,7 +108,10 @@
 #include "ui/instanceview/InstanceDelegate.h"
 #include "ui/instanceview/InstanceProxyModel.h"
 #include "ui/StarNavRail.h"
+#include "ui/StarPage.h"
+#include "ui/StarShell.h"
 #include "ui/instanceview/InstanceView.h"
+#include "ui/views/StarPlaceholderView.h"
 #include "ui/themes/ITheme.h"
 #include "ui/themes/ThemeManager.h"
 #include "ui/widgets/LabeledToolButton.h"
@@ -198,10 +201,10 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
         addToolBar(Qt::LeftToolBarArea, m_navRail);
 
         connect(m_navRail, &StarNavRail::startRequested, this, &MainWindow::showStarStartPage);
-        connect(m_navRail, &StarNavRail::instancesRequested, this, [this] { ui->instanceToolBar->setVisible(true); });
-        connect(m_navRail, &StarNavRail::browseRequested, this, &MainWindow::on_actionAddInstance_triggered);
-        connect(m_navRail, &StarNavRail::accountsRequested, this, &MainWindow::on_actionManageAccounts_triggered);
-        connect(m_navRail, &StarNavRail::settingsRequested, this, &MainWindow::on_actionSettings_triggered);
+        connect(m_navRail, &StarNavRail::instancesRequested, this, &MainWindow::showStarInstancesPage);
+        connect(m_navRail, &StarNavRail::browseRequested, this, &MainWindow::showStarBrowsePage);
+        connect(m_navRail, &StarNavRail::accountsRequested, this, &MainWindow::showStarAccountsPage);
+        connect(m_navRail, &StarNavRail::settingsRequested, this, &MainWindow::showStarSettingsPage);
         connect(m_navRail, &StarNavRail::appearanceToggleRequested, this, &MainWindow::cycleTheme);
 
         // keep the Instances entry in step with the instance toolbar
@@ -350,7 +353,31 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
         view->setSourceOfGroupCollapseStatus(
             [](const QString& groupName) -> bool { return APPLICATION->instances()->isGroupCollapsed(groupName); });
         connect(view, &InstanceView::groupStateChanged, APPLICATION->instances(), &InstanceList::on_GroupStateChanged);
-        ui->horizontalLayout->addWidget(view);
+        // the shell owns the window's content: the title strip on top and the
+        // page stack below, with the instance view as its launcher page
+        {
+            m_shell = new StarShell(ui->centralWidget);
+            m_shell->setLauncherPage(view);
+
+            m_activePage = m_shell->showPage(StarNavRail::Page::Instances, view,
+                                             tr("Instances"), tr("Launch and manage your Minecraft installs."));
+
+            connect(m_shell, &StarShell::searchChanged, this, [this](const QString& needle) {
+                setInstanceSearchTerm(needle);
+                instanceChanged(view->selectionModel()->currentIndex(), QModelIndex());
+            });
+            connect(m_shell, &StarShell::quickStartRequested, this,
+                    &MainWindow::on_actionLaunchInstance_triggered);
+            connect(m_shell, &StarShell::accountRequested, this,
+                    &MainWindow::on_actionManageAccounts_triggered);
+            connect(m_shell, &StarShell::subPageBack, this,
+                    [this] { m_navRail->setCurrentPage(m_shell->currentRailPage()); });
+
+            setInstanceSearchTerm(QString());
+            updateShellAccountCaption();
+
+            ui->horizontalLayout->addWidget(m_shell);
+        }
     }
     // The cat background
     {
@@ -654,6 +681,101 @@ void MainWindow::cycleTheme()
     APPLICATION->themeManager()->setApplicationTheme(id);
     APPLICATION->settings()->set("ApplicationTheme", id);
     updateThemeMenu();
+}
+
+void MainWindow::setInstanceSearchTerm(const QString& term)
+{
+    // the same signal the launcher's own search box drives
+    if (proxymodel) {
+        // InstanceProxyModel::setFilterFixedString is its public search path
+        proxymodel->setFilterFixedString(term);
+    }
+}
+
+void MainWindow::updateShellAccountCaption()
+{
+    if (!m_shell) {
+        return;
+    }
+    QString name;
+    if (auto* accounts = APPLICATION->accounts()) {
+        if (auto account = accounts->defaultAccount()) {
+            name = account->displayName();
+        }
+    }
+    m_shell->setAccountCaption(name);
+}
+
+void MainWindow::showStarInstancesPage()
+{
+    m_navRail->setCurrentPage(StarNavRail::Page::Instances);
+    if (m_shell) {
+        m_shell->setPageSubtitle(tr("Launch and manage your Minecraft installs."));
+    }
+    ui->instanceToolBar->setVisible(true);
+}
+
+void MainWindow::showStarStartPage()
+{
+    m_navRail->setCurrentPage(StarNavRail::Page::Start);
+    if (m_shell) {
+        m_shell->setPageSubtitle(tr("Search below, launch from Quick start, or pick an install."));
+    }
+    if (view && view->selectionModel()) {
+        view->selectionModel()->setCurrentIndex(QModelIndex(), QItemSelectionModel::ClearAndSelect);
+    }
+    ui->instanceToolBar->setVisible(false);
+}
+
+void MainWindow::showStarBrowsePage()
+{
+    m_navRail->setCurrentPage(StarNavRail::Page::Browse);
+
+    if (m_shell) {
+        auto* ph = new StarPlaceholderView(StarNavRail::Page::Browse);
+        auto* cta = ph->callToAction();
+        cta->setText(tr("Browse modpacks"));
+        cta->setVisible(true);
+        m_shell->showPage(StarNavRail::Page::Browse, ph, tr("Browse content"),
+                          tr("Install modpacks, mods, resource packs, worlds and shaders."));
+        connect(cta, &QToolButton::clicked, this,
+                [this] { on_actionAddInstance_triggered(); });
+    }
+}
+
+void MainWindow::showStarAccountsPage()
+{
+    m_navRail->setCurrentPage(StarNavRail::Page::Accounts);
+
+    if (m_shell) {
+        auto* ph = new StarPlaceholderView(StarNavRail::Page::Accounts);
+        auto* cta = ph->callToAction();
+        cta->setText(tr("Manage accounts"));
+        cta->setVisible(true);
+        m_shell->showPage(StarNavRail::Page::Accounts, ph, tr("Accounts"),
+                          tr("Add and switch your Microsoft and Mojang sign-ins."));
+        connect(cta, &QToolButton::clicked, this, [this] {
+            APPLICATION->ShowGlobalSettings(this, "accounts");
+            updateShellAccountCaption();
+        });
+    }
+}
+
+void MainWindow::showStarSettingsPage()
+{
+    m_navRail->setCurrentPage(StarNavRail::Page::Settings);
+
+    if (m_shell) {
+        auto* ph = new StarPlaceholderView(StarNavRail::Page::Settings);
+        auto* cta = ph->callToAction();
+        cta->setText(tr("Open settings"));
+        cta->setVisible(true);
+        m_shell->showPage(StarNavRail::Page::Settings, ph, tr("Settings"),
+                          tr("Tune the launcher, Java and your downloads."));
+        connect(cta, &QToolButton::clicked, this, [this] {
+            APPLICATION->ShowGlobalSettings(this, "global-settings");
+        });
+    }
 }
 
 void MainWindow::updateThemeMenu()
