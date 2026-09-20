@@ -872,6 +872,8 @@ SET(LAUNCHER_SOURCES
     ui/themes/DarkTheme.h
     ui/themes/StarTheme.cpp
     ui/themes/StarTheme.h
+    ui/StarNavRail.cpp
+    ui/StarNavRail.h
     ui/themes/ITheme.cpp
     ui/themes/ITheme.h
     ui/themes/HintOverrideProxyStyle.cpp

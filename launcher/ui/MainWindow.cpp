@@ -107,6 +107,7 @@
 #include "ui/dialogs/ProgressDialog.h"
 #include "ui/instanceview/InstanceDelegate.h"
 #include "ui/instanceview/InstanceProxyModel.h"
+#include "ui/StarNavRail.h"
 #include "ui/instanceview/InstanceView.h"
 #include "ui/themes/ITheme.h"
 #include "ui/themes/ThemeManager.h"
@@ -189,6 +190,24 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
         ui->instanceToolBar->addContextMenuAction(ui->instanceToolBar->toggleViewAction());
         ui->instanceToolBar->addContextMenuAction(ui->actionToggleStatusBar);
         ui->instanceToolBar->addContextMenuAction(ui->actionLockToolbars);
+    }
+
+    // the Star Client navigation rail, down the left edge
+    {
+        m_navRail = new StarNavRail(this);
+        addToolBar(Qt::LeftToolBarArea, m_navRail);
+
+        connect(m_navRail, &StarNavRail::startRequested, this, &MainWindow::showStarStartPage);
+        connect(m_navRail, &StarNavRail::instancesRequested, this, [this] { ui->instanceToolBar->setVisible(true); });
+        connect(m_navRail, &StarNavRail::browseRequested, this, &MainWindow::on_actionAddInstance_triggered);
+        connect(m_navRail, &StarNavRail::accountsRequested, this, &MainWindow::on_actionManageAccounts_triggered);
+        connect(m_navRail, &StarNavRail::settingsRequested, this, &MainWindow::on_actionSettings_triggered);
+        connect(m_navRail, &StarNavRail::appearanceToggleRequested, this, &MainWindow::cycleTheme);
+
+        // keep the Instances entry in step with the instance toolbar
+        connect(ui->instanceToolBar->toggleViewAction(), &QAction::triggered, this, [this](bool shown) {
+            m_navRail->setCurrentPage(shown ? StarNavRail::Page::Instances : StarNavRail::Page::Start);
+        });
     }
 
     // set the menu for the folders help, accounts, and export tool buttons
@@ -604,6 +623,37 @@ void MainWindow::updateLaunchButton()
     if (m_selectedInstance)
         m_selectedInstance->populateLaunchMenu(launchMenu);
     ui->actionLaunchInstance->setMenu(launchMenu);
+}
+
+void MainWindow::showStarStartPage()
+{
+    m_navRail->setCurrentPage(StarNavRail::Page::Start);
+
+    // Star Start is the launcher at rest: nothing is picked, so the window
+    // falls back to the instance list on its own and the per-instance pane
+    // steps out of the way. The landing page itself (hero, quick start) is
+    // the next piece of the redesign.
+    if (view && view->selectionModel()) {
+        view->selectionModel()->setCurrentIndex(QModelIndex(), QItemSelectionModel::ClearAndSelect);
+    }
+    ui->instanceToolBar->setVisible(false);
+}
+
+void MainWindow::cycleTheme()
+{
+    // The three Star Client themes, in the order they are registered. Anything
+    // else (a system style, a theme from disk) jumps back to OLED Black, which
+    // is the launcher's own look and the default for new installs.
+    static const QStringList cycle{ QStringLiteral("star-oled"), QStringLiteral("star-midnight"),
+                                    QStringLiteral("star-daylight") };
+
+    const QString current = APPLICATION->settings()->get("ApplicationTheme").toString();
+    const int next = (cycle.indexOf(current) + 1) % cycle.size();
+
+    const QString id = cycle.at(next);
+    APPLICATION->themeManager()->setApplicationTheme(id);
+    APPLICATION->settings()->set("ApplicationTheme", id);
+    updateThemeMenu();
 }
 
 void MainWindow::updateThemeMenu()

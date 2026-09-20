@@ -1,6 +1,12 @@
 <!DOCTYPE RCC>
 <RCC version="1.0">
   <qresource prefix="/starclient">
+    <file>icons/rail-home.svg</file>
+    <file>icons/rail-grid.svg</file>
+    <file>icons/rail-compass.svg</file>
+    <file>icons/rail-users.svg</file>
+    <file>icons/rail-cog.svg</file>
+    <file>icons/rail-moon.svg</file>
     <file>icons/check.svg</file>
     <file>icons/chevron-down.svg</file>
     <file>icons/chevron-up.svg</file>

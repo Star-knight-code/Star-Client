@@ -64,6 +64,7 @@ class LabeledToolButton;
 
 namespace Ui {
 class MainWindow;
+class StarNavRail;
 }
 class MainWindow : public QMainWindow {
     Q_OBJECT
@@ -182,6 +183,11 @@ class MainWindow : public QMainWindow {
 
     void updateThemeMenu();
 
+    /// Opens the Star Start page, the landing view of the rail.
+    void showStarStartPage();
+    /// Steps through the three Star Client themes.
+    void cycleTheme();
+
     void instanceActivated(QModelIndex);
 
     void instanceChanged(const QModelIndex& current, const QModelIndex& previous);
@@ -234,6 +240,7 @@ class MainWindow : public QMainWindow {
     Ui::MainWindow* ui;
     // these are managed by Qt's memory management model!
     InstanceView* view = nullptr;
+    StarNavRail* m_navRail = nullptr;
     InstanceProxyModel* proxymodel = nullptr;
     QToolButton* newsLabel = nullptr;
     QLabel* m_statusLeft = nullptr;
