@@ -61,10 +61,10 @@ class InstanceView;
 class KonamiCode;
 class InstanceTask;
 class LabeledToolButton;
+class StarNavRail;
 
 namespace Ui {
 class MainWindow;
-class StarNavRail;
 }
 class MainWindow : public QMainWindow {
     Q_OBJECT
