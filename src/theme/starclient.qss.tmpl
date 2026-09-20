@@ -18,8 +18,11 @@
 /* --------------------------------------------------------------------------
  * 1. Base + typography
  * -------------------------------------------------------------------------- */
+/* Plain widgets inherit their parent's background. Painting every QWidget
+   would turn spacers, toolbars' separators and any unstyled container into
+   opaque blocks -- the window surfaces below own the background instead. */
 QWidget {
-    background-color: {{c.bg-base}};
+    background: transparent;
     color: {{c.text-primary}};
     font-family: {{f.family-ui}};
     font-size: {{f.size-md}};
@@ -32,6 +35,10 @@ QWidget[starRole="transparent"] { background: transparent; }
 QWidget[starRole="sunken"]      { background-color: {{c.bg-sunken}}; }
 QWidget[starRole="surface"]     { background-color: {{c.bg-surface}}; }
 QWidget[starRole="elevated"]    { background-color: {{c.bg-elevated}}; }
+
+QMainWindow, QWizard, QDialog {
+    background-color: {{c.bg-base}};
+}
 
 QMainWindow::separator {
     background-color: {{c.border-subtle}};
@@ -214,6 +221,7 @@ QToolBar#starNavRail, QToolBar[starRole="navrail"] {
 QToolBar#starNavRail QToolButton {
     min-width: 44px;
     min-height: 44px;
+    padding: {{s.1}};
     border-radius: {{r.md}};
 }
 QToolBar#starNavRail QToolButton:checked {
@@ -233,6 +241,7 @@ QToolBar {
 QToolBar::separator {
     background-color: {{c.border-subtle}};
     width: 1px;
+    height: 1px;
     margin: {{s.2}} {{s.3}};
 }
 
