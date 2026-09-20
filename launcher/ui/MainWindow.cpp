@@ -652,19 +652,6 @@ void MainWindow::updateLaunchButton()
     ui->actionLaunchInstance->setMenu(launchMenu);
 }
 
-void MainWindow::showStarStartPage()
-{
-    m_navRail->setCurrentPage(StarNavRail::Page::Start);
-
-    // Star Start is the launcher at rest: nothing is picked, so the window
-    // falls back to the instance list on its own and the per-instance pane
-    // steps out of the way. The landing page itself (hero, quick start) is
-    // the next piece of the redesign.
-    if (view && view->selectionModel()) {
-        view->selectionModel()->setCurrentIndex(QModelIndex(), QItemSelectionModel::ClearAndSelect);
-    }
-    ui->instanceToolBar->setVisible(false);
-}
 
 void MainWindow::cycleTheme()
 {
