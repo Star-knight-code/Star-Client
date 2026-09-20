@@ -199,6 +199,12 @@ QToolButton[starRole="primary"]:hover { background-color: #9083FF; }
 QToolButton[starRole="danger"]:hover  { background-color: rgba(217,58,76,0.12); color: #D93A4C; }
 QToolButton::menu-indicator { image: none; width: 0; }
 
+/* the title strip that leads each page */
+#starHeader {
+    background-color: #FFFFFF;
+    border-bottom: 1px solid #E6E9F2;
+}
+
 /* back off an Install or Edit page */
 QToolButton#starBack {
     background: transparent;
