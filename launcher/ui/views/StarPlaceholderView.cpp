@@ -67,7 +67,7 @@ StarPlaceholderView::StarPlaceholderView(StarNavRail::Page page, QWidget* parent
     column->setContentsMargins(40, 40, 40, 40);
     column->setSpacing(0);
 
-    column->addStretch(2);
+    column->addStretch(1);
 
     m_star = new QLabel(this);
     m_star->setAlignment(Qt::AlignCenter);
@@ -86,7 +86,7 @@ StarPlaceholderView::StarPlaceholderView(StarNavRail::Page page, QWidget* parent
     m_blurb->setProperty("starRole", QStringLiteral("muted"));
     m_blurb->setAlignment(Qt::AlignCenter);
     m_blurb->setWordWrap(true);
-    m_blurb->setMaximumWidth(520);
+    m_blurb->setMaximumWidth(660);
     column->addWidget(m_blurb, 0, Qt::AlignHCenter);
 
     column->addSpacing(30);
