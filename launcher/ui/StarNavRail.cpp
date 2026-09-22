@@ -110,6 +110,8 @@ QString StarNavRail::pageTitle(Page page)
             return tr("Browse content");
         case Page::Accounts:
             return tr("Accounts");
+        case Page::Edit:
+            return tr("Edit");
         case Page::Settings:
             return tr("Settings");
     }
