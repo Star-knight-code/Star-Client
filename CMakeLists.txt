@@ -171,7 +171,7 @@ endif()
 ##################################### Set Application options #####################################
 
 ######## Set URLs ########
-set(Launcher_NEWS_RSS_URL "https://prismlauncher.org/feed/feed.xml" CACHE STRING "URL to fetch Prism Launcher's news RSS feed from.")
+set(Launcher_NEWS_RSS_URL "https://github.com/Star-knight-code/Star-Client/releases.atom" CACHE STRING "URL to fetch Star Client's news feed from.")
 set(Launcher_NEWS_OPEN_URL "https://github.com/Star-knight-code/Star-Client/releases" CACHE STRING "URL that gets opened when the user clicks 'More News'")
 set(Launcher_WIKI_URL "https://github.com/Star-knight-code/Star-Client/wiki/" CACHE STRING "URL that gets opened when the user clicks 'Launcher Help'")
 set(Launcher_HELP_URL "https://github.com/Star-knight-code/Star-Client/wiki/help-pages/%1" CACHE STRING "URL (with arg %1 to be substituted with page-id) that gets opened when the user requests help in a dialog window")

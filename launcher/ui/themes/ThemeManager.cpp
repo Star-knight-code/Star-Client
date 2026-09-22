@@ -144,7 +144,11 @@ void ThemeManager::initializeWidgets()
     themeDebugLog() << "Loading Star Client Theme:"
                     << addTheme(std::make_unique<StarTheme>(StarTheme::Variant::Midnight));
     themeDebugLog() << "Loading Star Client Theme:"
+                    << addTheme(std::make_unique<StarTheme>(StarTheme::Variant::Navy));
+    themeDebugLog() << "Loading Star Client Theme:"
                     << addTheme(std::make_unique<StarTheme>(StarTheme::Variant::Daylight));
+    themeDebugLog() << "Loading Star Client Theme:"
+                    << addTheme(std::make_unique<StarTheme>(StarTheme::Variant::White));
 
     themeDebugLog() << "Loading Built-in Theme:" << addTheme(std::make_unique<SystemTheme>(m_defaultStyle, m_defaultPalette, true));
     auto darkThemeId = addTheme(std::make_unique<DarkTheme>());

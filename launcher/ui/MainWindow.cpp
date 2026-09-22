@@ -659,7 +659,8 @@ void MainWindow::cycleTheme()
     // else (a system style, a theme from disk) jumps back to OLED Black, which
     // is the launcher's own look and the default for new installs.
     static const QStringList cycle{ QStringLiteral("star-oled"), QStringLiteral("star-midnight"),
-                                    QStringLiteral("star-daylight") };
+                                    QStringLiteral("star-navy"), QStringLiteral("star-daylight"),
+                                    QStringLiteral("star-white") };
 
     const QString current = APPLICATION->settings()->get("ApplicationTheme").toString();
     const int next = (cycle.indexOf(current) + 1) % cycle.size();

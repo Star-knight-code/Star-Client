@@ -25,6 +25,10 @@ THEMES = {
                      button="#15151C", highlight="#7C6BFF", name="Midnight"),
     "daylight": dict(qss="starclient-light.qss", window="#F2F4FA", base="#FFFFFF", text="#0F131C",
                      button="#FFFFFF", highlight="#6450F0", name="Daylight"),
+    "navy": dict(qss="starclient-navy.qss", window="#070D1A", base="#0A1424", text="#E9EEF9",
+                 button="#0D1730", highlight="#7C6BFF", name="Navy"),
+    "white": dict(qss="starclient-white.qss", window="#FFFFFF", base="#FFFFFF", text="#0F131C",
+                  button="#FFFFFF", highlight="#6450F0", name="White"),
 }
 
 

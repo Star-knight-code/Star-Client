@@ -18,6 +18,8 @@
     <file>icons/switch-knob-on.svg</file>
     <file>generated/starclient-oled.qss</file>
     <file>generated/starclient-dark.qss</file>
+    <file>generated/starclient-navy.qss</file>
     <file>generated/starclient-light.qss</file>
+    <file>generated/starclient-white.qss</file>
   </qresource>
 </RCC>

@@ -33,8 +33,12 @@ QString qssPathFor(StarTheme::Variant variant)
             return ":/starclient/generated/starclient-oled.qss";
         case StarTheme::Variant::Midnight:
             return ":/starclient/generated/starclient-dark.qss";
+        case StarTheme::Variant::Navy:
+            return ":/starclient/generated/starclient-navy.qss";
         case StarTheme::Variant::Daylight:
             return ":/starclient/generated/starclient-light.qss";
+        case StarTheme::Variant::White:
+            return ":/starclient/generated/starclient-white.qss";
     }
     return {};
 }
@@ -46,8 +50,12 @@ QString idFor(StarTheme::Variant variant)
             return "star-oled";
         case StarTheme::Variant::Midnight:
             return "star-midnight";
+        case StarTheme::Variant::Navy:
+            return "star-navy";
         case StarTheme::Variant::Daylight:
             return "star-daylight";
+        case StarTheme::Variant::White:
+            return "star-white";
     }
     return {};
 }
@@ -78,8 +86,12 @@ QString StarTheme::name()
             return QObject::tr("Star Client OLED Black", "Application theme name");
         case Variant::Midnight:
             return QObject::tr("Star Client Midnight", "Application theme name");
+        case Variant::Navy:
+            return QObject::tr("Star Client Navy", "Application theme name");
         case Variant::Daylight:
             return QObject::tr("Star Client Daylight", "Application theme name");
+        case Variant::White:
+            return QObject::tr("Star Client White", "Application theme name");
     }
     return {};
 }
@@ -91,15 +103,19 @@ QString StarTheme::tooltip()
             return QObject::tr("True #000000 panels. The signature Star Client look, easiest on OLED displays.");
         case Variant::Midnight:
             return QObject::tr("Soft dark greys with lower contrast than OLED Black.");
+        case Variant::Navy:
+            return QObject::tr("Midnight's dark greys tinted deep blue.");
         case Variant::Daylight:
             return QObject::tr("Bright, high-contrast light theme for daytime use.");
+        case Variant::White:
+            return QObject::tr("Pure white light theme - the cleanest variant.");
     }
     return {};
 }
 
 bool StarTheme::isDark() const
 {
-    return m_variant != Variant::Daylight;
+    return m_variant == Variant::Oled || m_variant == Variant::Midnight || m_variant == Variant::Navy;
 }
 
 QString StarTheme::appStyleSheet()

@@ -40,7 +40,7 @@
 class StarTheme : public ITheme {
    public:
     /// Which generated stylesheet this instance wraps.
-    enum class Variant { Oled, Midnight, Daylight };
+    enum class Variant { Oled, Midnight, Navy, Daylight, White };
 
     /// Accent presets, matching theme/tokens.json -> accents.
     enum class Accent { Starlight, Aurora, Nova, Solar, Emerald, Ember };
