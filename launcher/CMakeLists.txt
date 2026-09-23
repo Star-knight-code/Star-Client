@@ -878,6 +878,8 @@ SET(LAUNCHER_SOURCES
     ui/StarPage.h
     ui/StarShell.cpp
     ui/StarShell.h
+    ui/views/StarHomeView.cpp
+    ui/views/StarHomeView.h
     ui/views/StarPlaceholderView.cpp
     ui/views/StarPlaceholderView.h
     ui/themes/ITheme.cpp

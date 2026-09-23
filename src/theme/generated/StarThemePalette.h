@@ -25,6 +25,19 @@ inline constexpr Color gradientTo { "#4FC3F7" };
 inline constexpr Color accentRgb { "124,107,255" };
 }
 
+// Navy
+namespace AccentNavy {
+inline constexpr Color accent { "#4C7DF0" };
+inline constexpr Color accentHover { "#6E94F4" };
+inline constexpr Color accentPressed { "#3A66DB" };
+inline constexpr Color accentSoft { "rgba(76,125,240,0.14)" };
+inline constexpr Color accentSoftStrong { "rgba(76,125,240,0.24)" };
+inline constexpr Color accentRing { "rgba(76,125,240,0.45)" };
+inline constexpr Color gradientFrom { "#6E94F4" };
+inline constexpr Color gradientTo { "#4FA3F7" };
+inline constexpr Color accentRgb { "76,125,240" };
+}
+
 // Aurora
 namespace AccentAurora {
 inline constexpr Color accent { "#35D6ED" };
@@ -178,44 +191,44 @@ inline constexpr Color star { "#FFFFFF" };
 
 // Navy - dark
 namespace ThemeNavy {
-inline constexpr Color bgBase { "#070D1A" };
-inline constexpr Color bgSunken { "#04070F" };
-inline constexpr Color bgSurface { "#0A1322" };
-inline constexpr Color bgCard { "#0D1730" };
-inline constexpr Color bgCardHover { "#122040" };
-inline constexpr Color bgElevated { "#13203C" };
-inline constexpr Color bgHover { "#14223E" };
-inline constexpr Color bgActive { "#1B2E50" };
-inline constexpr Color bgSelected { "#1C2A4E" };
-inline constexpr Color bgSidebar { "#060B14" };
-inline constexpr Color bgTitlebar { "#050A13" };
-inline constexpr Color bgInput { "#0A1424" };
-inline constexpr Color bgScrim { "rgba(6,6,10,0.66)" };
-inline constexpr Color bgSkeleton { "#111B30" };
-inline constexpr Color borderSubtle { "#16233C" };
-inline constexpr Color border { "#1E2E4E" };
-inline constexpr Color borderStrong { "#2A405F" };
+inline constexpr Color bgBase { "#000000" };
+inline constexpr Color bgSunken { "#000000" };
+inline constexpr Color bgSurface { "#07070A" };
+inline constexpr Color bgCard { "#0B0B0F" };
+inline constexpr Color bgCardHover { "#121218" };
+inline constexpr Color bgElevated { "#121218" };
+inline constexpr Color bgHover { "#16161D" };
+inline constexpr Color bgActive { "#1E1E27" };
+inline constexpr Color bgSelected { "#1A1730" };
+inline constexpr Color bgSidebar { "#040406" };
+inline constexpr Color bgTitlebar { "#000000" };
+inline constexpr Color bgInput { "#0A0A0E" };
+inline constexpr Color bgScrim { "rgba(0,0,0,0.72)" };
+inline constexpr Color bgSkeleton { "#15151C" };
+inline constexpr Color borderSubtle { "#17171F" };
+inline constexpr Color border { "#20202A" };
+inline constexpr Color borderStrong { "#2C2C38" };
 inline constexpr Color borderFocus { "#7C6BFF" };
-inline constexpr Color textPrimary { "#E9EEF9" };
-inline constexpr Color textSecondary { "#9FAAC6" };
-inline constexpr Color textMuted { "#68728E" };
-inline constexpr Color textDisabled { "#4A536C" };
-inline constexpr Color textInverse { "#0C0C11" };
+inline constexpr Color textPrimary { "#F3F4F8" };
+inline constexpr Color textSecondary { "#A6AAB8" };
+inline constexpr Color textMuted { "#6C7080" };
+inline constexpr Color textDisabled { "#4A4E5C" };
+inline constexpr Color textInverse { "#0A0A0E" };
 inline constexpr Color accentContrast { "#FFFFFF" };
 inline constexpr Color success { "#3ED598" };
-inline constexpr Color successSoft { "rgba(62,213,152,0.16)" };
+inline constexpr Color successSoft { "rgba(62,213,152,0.14)" };
 inline constexpr Color warning { "#FFC24B" };
-inline constexpr Color warningSoft { "rgba(255,194,75,0.16)" };
+inline constexpr Color warningSoft { "rgba(255,194,75,0.14)" };
 inline constexpr Color danger { "#FF5C6C" };
-inline constexpr Color dangerSoft { "rgba(255,92,108,0.16)" };
+inline constexpr Color dangerSoft { "rgba(255,92,108,0.14)" };
 inline constexpr Color info { "#4CC2FF" };
-inline constexpr Color infoSoft { "rgba(76,194,255,0.16)" };
-inline constexpr Color shadow1 { "0 1px 2px rgba(0,0,0,0.5)" };
-inline constexpr Color shadow2 { "0 10px 28px rgba(0,0,0,0.45)" };
-inline constexpr Color shadow3 { "0 20px 52px rgba(0,0,0,0.55)" };
-inline constexpr Color glow { "0 0 32px rgba(124,107,255,0.22)" };
-inline constexpr Color scrollbarThumb { "#2C2C38" };
-inline constexpr Color scrollbarThumbHover { "#3A3A48" };
+inline constexpr Color infoSoft { "rgba(76,194,255,0.14)" };
+inline constexpr Color shadow1 { "0 1px 2px rgba(0,0,0,0.85)" };
+inline constexpr Color shadow2 { "0 8px 24px rgba(0,0,0,0.80)" };
+inline constexpr Color shadow3 { "0 18px 48px rgba(0,0,0,0.88)" };
+inline constexpr Color glow { "0 0 32px rgba(124,107,255,0.28)" };
+inline constexpr Color scrollbarThumb { "#26262F" };
+inline constexpr Color scrollbarThumbHover { "#34343F" };
 inline constexpr Color star { "#FFFFFF" };
 }
 
@@ -315,6 +328,7 @@ enum class ThemeId {
 
 enum class AccentId {
     Starlight,
+    Navy,
     Aurora,
     Nova,
     Solar,
@@ -337,6 +351,7 @@ inline constexpr ThemeInfo kThemes[] = {
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
 inline constexpr AccentInfo kAccents[] = {
     { AccentId::Starlight, "starlight", "Starlight" },
+    { AccentId::Navy, "navy", "Navy" },
     { AccentId::Aurora, "aurora", "Aurora" },
     { AccentId::Nova, "nova", "Nova" },
     { AccentId::Solar, "solar", "Solar" },

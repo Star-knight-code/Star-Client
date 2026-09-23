@@ -373,6 +373,11 @@ QVariant TranslationsModel::data(const QModelIndex& index, const int role) const
                     return lang.languageName();
                 }
                 case Column::Completeness: {
+                    // English (US) is the source strings: it is complete by definition,
+                    // whatever the translation index claims.
+                    if (lang.key == QLatin1String("en") || lang.key == QLatin1String("en_US")) {
+                        return QStringLiteral("100.0%");
+                    }
                     return QString("%1%").arg(lang.percentTranslated(), 3, 'f', 1);
                 }
             }

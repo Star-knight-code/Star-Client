@@ -35,7 +35,7 @@ class ThemeWizardPage : public BaseWizardPage {
         setLayout(layout);
 
         setTitle(tr("Appearance"));
-        setSubTitle(tr("Select theme and icons to use"));
+        setSubTitle(tr("Select the theme to use"));
     }
 
     bool validatePage() override { return true; };

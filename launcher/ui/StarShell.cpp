@@ -23,6 +23,7 @@
 #include <QLabel>
 #include <QLineEdit>
 #include <QPalette>
+#include <QPainter>
 #include <QSizePolicy>
 #include <QToolButton>
 #include <QVBoxLayout>
@@ -50,9 +51,9 @@ QWidget* StarShell::buildHeaderBar()
     brandRow->setContentsMargins(0, 0, 0, 0);
     brandRow->setSpacing(9);
 
-    auto* mark = new QLabel(brand);
-    mark->setPixmap(QIcon(QStringLiteral(":/starclient/icons/star-glyph.svg")).pixmap(QSize(20, 20)));
-    brandRow->addWidget(mark);
+    m_brandMark = new QLabel(brand);
+    brandRow->addWidget(m_brandMark);
+    retintBrand();
 
     auto* name = new QLabel(QStringLiteral("Star Client"), brand);
     name->setProperty("starRole", QStringLiteral("h2"));
@@ -106,6 +107,13 @@ StarPage* StarShell::showPage(StarNavRail::Page page, QWidget* view, const QStri
         popSubPage();
     }
     if (m_page) {
+        // The launcher's view is a permanent citizen of the window: it was
+        // parented into the page about to be destroyed, so unhook it first or
+        // the next rail move crashes on a dangling pointer.
+        if (m_launcherPage) {
+            m_launcherPage->setParent(this);
+            m_launcherPage->setVisible(false);
+        }
         removeWidget(m_page);
         m_page->deleteLater();
     }
@@ -121,6 +129,7 @@ StarPage* StarShell::showPage(StarNavRail::Page page, QWidget* view, const QStri
     column->setSpacing(0);
     column->addWidget(buildHeaderBar());
     column->addWidget(view, 1);
+    view->setVisible(true);
     m_page->setBody(inner);
 
     addWidget(m_page);
@@ -240,10 +249,47 @@ void StarShell::retranslate()
     setAccountCaption(m_accountName);
 }
 
+void StarShell::retintBrand()
+{
+    if (!m_brandMark) {
+        return;
+    }
+    // The SVG ships in the accent purple; the title strip wants the theme's
+    // star colour, exactly like the rail's mark.
+    const qreal dpr = qApp->devicePixelRatio();
+    const QIcon source(QStringLiteral(":/starclient/icons/star-glyph.svg"));
+    const QPixmap masked = source.pixmap(QSize(20, 20), dpr);
+    if (masked.isNull()) {
+        m_brandMark->clear();
+        return;
+    }
+    const QColor window = QApplication::palette().color(QPalette::Window);
+    const QColor color = window.lightness() > 128 ? QColor(0x0F, 0x13, 0x1C) : QColor(Qt::white);
+
+    QPixmap out(masked.size());
+    out.setDevicePixelRatio(dpr);
+    out.fill(Qt::transparent);
+    QPainter painter(&out);
+    painter.drawPixmap(0, 0, masked);
+    painter.setCompositionMode(QPainter::CompositionMode_SourceIn);
+    painter.fillRect(out.rect(), color);
+    painter.end();
+    m_brandMark->setPixmap(out);
+}
+
 void StarShell::changeEvent(QEvent* event)
 {
     QStackedWidget::changeEvent(event);
-    if (event->type() == QEvent::LanguageChange) {
-        retranslate();
+    switch (event->type()) {
+        case QEvent::LanguageChange:
+            retranslate();
+            break;
+        case QEvent::PaletteChange:
+        case QEvent::ApplicationPaletteChange:
+        case QEvent::StyleChange:
+            retintBrand();
+            break;
+        default:
+            break;
     }
 }

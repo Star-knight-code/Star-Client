@@ -84,6 +84,10 @@ class MainWindow : public QMainWindow {
     void updatesAllowedChanged(bool allowed);
 
     void processURLs(QList<QUrl> urls);
+
+    /// Keeps the legacy top chrome (menu bar, icon strip, news ticker) hidden.
+    /// Called again after restoreState(), which replays saved toolbar visibility.
+    void hideLegacyChrome();
    signals:
     void isClosing();
 
@@ -150,6 +154,11 @@ class MainWindow : public QMainWindow {
     void newsButtonClicked();
 
     void on_actionLaunchInstance_triggered();
+
+    /// Smart Quick start: last played, else the selection, else the first instance, else New instance.
+    void quickLaunch();
+    /// Every launch remembered for Quick start.
+    void launchInstance(BaseInstance* instance);
 
     void on_actionKillInstance_triggered();
 

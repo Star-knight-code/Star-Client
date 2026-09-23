@@ -175,13 +175,13 @@ set(Launcher_NEWS_RSS_URL "https://github.com/Star-knight-code/Star-Client/relea
 set(Launcher_NEWS_OPEN_URL "https://github.com/Star-knight-code/Star-Client/releases" CACHE STRING "URL that gets opened when the user clicks 'More News'")
 set(Launcher_WIKI_URL "https://github.com/Star-knight-code/Star-Client/wiki/" CACHE STRING "URL that gets opened when the user clicks 'Launcher Help'")
 set(Launcher_HELP_URL "https://github.com/Star-knight-code/Star-Client/wiki/help-pages/%1" CACHE STRING "URL (with arg %1 to be substituted with page-id) that gets opened when the user requests help in a dialog window")
-set(Launcher_LOGIN_CALLBACK_URL "https://prismlauncher.org/successful-login" CACHE STRING "URL that gets opened when the user successfully logins.")
+set(Launcher_LOGIN_CALLBACK_URL "https://github.com/Star-knight-code/Star-Client#star-client" CACHE STRING "URL that gets opened when the user successfully logins.")
 set(Launcher_LEGACY_FMLLIBS_BASE_URL "https://files.prismlauncher.org/fmllibs/" CACHE STRING "URL for legacy (<=1.5.2) FML Libraries.")
 
 ######## Set version numbers ########
 set(Launcher_VERSION_MAJOR 0)
 set(Launcher_VERSION_MINOR 1)
-set(Launcher_VERSION_PATCH 2)
+set(Launcher_VERSION_PATCH 3)
 set(Launcher_VERSION_BUILD 0)
 
 if(DEFINED ENV{STARCLIENT_VERSION} AND NOT "$ENV{STARCLIENT_VERSION}" STREQUAL "")

@@ -72,6 +72,11 @@ StarTheme::StarTheme(Variant variant) : m_variant(variant)
             break;
         }
     }
+    // Never picked one? The Navy theme means OLED black dressed in navy;
+    // everywhere else the default starlight purple stays.
+    if (saved.isEmpty() && m_variant == Variant::Navy) {
+        m_accent = Accent::Navy;
+    }
 }
 
 QString StarTheme::id()
@@ -139,6 +144,8 @@ void StarTheme::setAccent(Accent accent)
 QString StarTheme::accentKey(Accent accent)
 {
     switch (accent) {
+        case Accent::Navy:
+            return "navy";
         case Accent::Starlight:
             return "starlight";
         case Accent::Aurora:
@@ -158,6 +165,8 @@ QString StarTheme::accentKey(Accent accent)
 QString StarTheme::accentName(Accent accent)
 {
     switch (accent) {
+        case Accent::Navy:
+            return QObject::tr("Navy");
         case Accent::Starlight:
             return QObject::tr("Starlight");
         case Accent::Aurora:
@@ -176,7 +185,7 @@ QString StarTheme::accentName(Accent accent)
 
 QList<StarTheme::Accent> StarTheme::allAccents()
 {
-    return { Accent::Starlight, Accent::Aurora, Accent::Nova, Accent::Solar, Accent::Emerald, Accent::Ember };
+    return { Accent::Navy, Accent::Starlight, Accent::Aurora, Accent::Nova, Accent::Solar, Accent::Emerald, Accent::Ember };
 }
 
 /// Values mirror theme/tokens.json -> accents. Starlight is the colour the
@@ -184,6 +193,9 @@ QList<StarTheme::Accent> StarTheme::allAccents()
 StarTheme::AccentColors StarTheme::colorsFor(Accent accent)
 {
     switch (accent) {
+        case Accent::Navy:
+            return { "#4C7DF0", "#6E94F4", "#3A66DB", "rgba(76,125,240,0.14)", "rgba(76,125,240,0.24)",
+                     "rgba(76,125,240,0.45)", "#6E94F4", "#4FA3F7", "76,125,240" };
         case Accent::Starlight:
             return { "#7C6BFF", "#9083FF", "#6450F0", "rgba(124,107,255,0.14)", "rgba(124,107,255,0.24)",
                      "rgba(124,107,255,0.45)", "#8B7BFF", "#4FC3F7", "124,107,255" };
@@ -235,7 +247,7 @@ QPalette StarTheme::colorScheme()
     // and the like). The stylesheet handles everything we control directly.
     QPalette palette;
     if (isDark()) {
-        const bool oled = m_variant == Variant::Oled;
+        const bool oled = m_variant == Variant::Oled || m_variant == Variant::Navy;
         const QColor window = oled ? QColor("#000000") : QColor("#0C0C11");
         const QColor base = oled ? QColor("#0A0A0E") : QColor("#101017");
         const QColor text = oled ? QColor("#F3F4F8") : QColor("#EEF0F6");

@@ -55,7 +55,7 @@ AccountListPage::AccountListPage(QWidget* parent) : QMainWindow(parent), ui(new 
     ui->setupUi(this);
     ui->listView->setEmptyString(
         tr("Welcome!\n"
-           "This build uses offline accounts. Use \"Add Offline\" to create one."));
+           "Add a Microsoft account to play online, or use \"Add Offline\" to start without one."));
     ui->listView->setEmptyMode(VersionListView::String);
     ui->listView->setContextMenuPolicy(Qt::CustomContextMenu);
 
@@ -83,10 +83,6 @@ AccountListPage::AccountListPage(QWidget* parent) : QMainWindow(parent), ui(new 
 
     updateButtonStates();
 
-    // This fork is offline-only.
-    ui->actionAddMicrosoft->setEnabled(false);
-    ui->actionAddMicrosoft->setToolTip(tr("This build uses offline accounts. Use \"Add Offline\"."));
-    ui->actionAddMicrosoft->setStatusTip(ui->actionAddMicrosoft->toolTip());
 }
 
 AccountListPage::~AccountListPage()

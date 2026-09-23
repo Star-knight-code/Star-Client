@@ -112,6 +112,7 @@
 #include "ui/StarShell.h"
 #include "ui/instanceview/InstanceView.h"
 #include "ui/views/StarPlaceholderView.h"
+#include "ui/views/StarHomeView.h"
 #include "ui/themes/ITheme.h"
 #include "ui/themes/ThemeManager.h"
 #include "ui/widgets/LabeledToolButton.h"
@@ -362,12 +363,9 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
             m_activePage = m_shell->showPage(StarNavRail::Page::Instances, view,
                                              tr("Instances"), tr("Launch and manage your Minecraft installs."));
 
-            connect(m_shell, &StarShell::searchChanged, this, [this](const QString& needle) {
-                setInstanceSearchTerm(needle);
-                instanceChanged(view->selectionModel()->currentIndex(), QModelIndex());
-            });
-            connect(m_shell, &StarShell::quickStartRequested, this,
-                    &MainWindow::on_actionLaunchInstance_triggered);
+            connect(m_shell, &StarShell::searchChanged, this,
+                    [this](const QString& needle) { setInstanceSearchTerm(needle); });
+            connect(m_shell, &StarShell::quickStartRequested, this, &MainWindow::quickLaunch);
             connect(m_shell, &StarShell::accountRequested, this,
                     &MainWindow::on_actionManageAccounts_triggered);
             connect(m_shell, &StarShell::subPageBack, this,
@@ -405,6 +403,8 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
         connect(ui->actionLockToolbars, &QAction::toggled, this, &MainWindow::lockToolbars);
         lockToolbars(toolbarsLocked);
     }
+    hideLegacyChrome();
+
     // start instance when double-clicked
     connect(view, &InstanceView::activated, this, &MainWindow::instanceActivated);
 
@@ -636,8 +636,12 @@ void MainWindow::showInstanceContextMenu(const QPoint& pos)
 
 void MainWindow::updateMainToolBar()
 {
-    ui->menuBar->setVisible(APPLICATION->settings()->get("MenuBarInsteadOfToolBar").toBool());
-    ui->mainToolBar->setVisible(ui->menuBar->isNativeMenuBar() || !APPLICATION->settings()->get("MenuBarInsteadOfToolBar").toBool());
+    // The top bar era is over: the rail and the pages are the navigation,
+    // so the menu bar, the icon strip and the news ticker all stay hidden,
+    // regardless of the old visibility settings.
+    ui->menuBar->setVisible(false);
+    ui->mainToolBar->setVisible(false);
+    ui->newsToolBar->setVisible(false);
 }
 
 void MainWindow::updateLaunchButton()
@@ -697,22 +701,41 @@ void MainWindow::updateShellAccountCaption()
 void MainWindow::showStarInstancesPage()
 {
     m_navRail->setCurrentPage(StarNavRail::Page::Instances);
-    if (m_shell) {
+    ui->instanceToolBar->setVisible(true);
+    if (!m_shell || !view) {
+        return;
+    }
+    if (m_shell->currentRailPage() != StarNavRail::Page::Instances) {
+        m_shell->showPage(StarNavRail::Page::Instances, view, tr("Instances"),
+                          tr("Launch and manage your Minecraft installs."));
+    } else {
         m_shell->setPageSubtitle(tr("Launch and manage your Minecraft installs."));
     }
-    ui->instanceToolBar->setVisible(true);
 }
 
 void MainWindow::showStarStartPage()
 {
-    m_navRail->setCurrentPage(StarNavRail::Page::Start);
-    if (m_shell) {
-        m_shell->setPageSubtitle(tr("Search below, launch from Quick start, or pick an install."));
-    }
     if (view && view->selectionModel()) {
         view->selectionModel()->setCurrentIndex(QModelIndex(), QItemSelectionModel::ClearAndSelect);
     }
     ui->instanceToolBar->setVisible(false);
+    if (!m_shell) {
+        return;
+    }
+    m_navRail->setCurrentPage(StarNavRail::Page::Start);
+
+    auto* home = new StarHomeView();
+    connect(home, &StarHomeView::newInstanceRequested, this, &MainWindow::on_actionAddInstance_triggered);
+    connect(home, &StarHomeView::browseRequested, this, &MainWindow::showStarBrowsePage);
+    connect(home, &StarHomeView::accountsRequested, this, &MainWindow::showStarAccountsPage);
+    connect(home, &StarHomeView::settingsRequested, this, &MainWindow::on_actionSettings_triggered);
+
+    const int count = proxymodel ? proxymodel->rowCount() : 0;
+    home->setSummary(count == 0 ? tr("No instances yet - this is where they will live.")
+                                : tr("%n instance(s) ready to play.", nullptr, count));
+
+    m_shell->showPage(StarNavRail::Page::Start, home, tr("Star Start"),
+                      tr("Search above, launch from Quick start, or pick an install."));
 }
 
 void MainWindow::showStarBrowsePage()
@@ -751,18 +774,11 @@ void MainWindow::showStarAccountsPage()
 
 void MainWindow::showStarSettingsPage()
 {
-    m_navRail->setCurrentPage(StarNavRail::Page::Settings);
-
+    // One settings surface, the one that works, reached in a single click.
+    APPLICATION->ShowGlobalSettings(this, "global-settings");
+    // the dialog was modal over whatever page was up; put the rail back on it
     if (m_shell) {
-        auto* ph = new StarPlaceholderView(StarNavRail::Page::Settings);
-        auto* cta = ph->callToAction();
-        cta->setText(tr("Open settings"));
-        cta->setVisible(true);
-        m_shell->showPage(StarNavRail::Page::Settings, ph, tr("Settings"),
-                          tr("Tune the launcher, Java and your downloads."));
-        connect(cta, &QToolButton::clicked, this, [this] {
-            APPLICATION->ShowGlobalSettings(this, "global-settings");
-        });
+        m_navRail->setCurrentPage(m_shell->currentRailPage());
     }
 }
 
@@ -1519,12 +1535,23 @@ void MainWindow::refreshInstances()
     APPLICATION->instances()->loadList();
 }
 
+void MainWindow::hideLegacyChrome()
+{
+    // The old toolbar row, the menu bar and the news bar keep their handlers
+    // but leave the stage: their icons belonged to the old skin, and the rail
+    // plus the pages cover every action they hosted.
+    ui->menuBar->setVisible(false);
+    ui->mainToolBar->setVisible(false);
+    ui->newsToolBar->setVisible(false);
+}
+
 void MainWindow::checkForUpdates()
 {
     if (APPLICATION->updaterEnabled()) {
         APPLICATION->triggerUpdateCheck();
     } else {
-        qWarning() << "Updater not set up. Cannot check for updates.";
+        // No bundled updater in this build: take the user to real releases.
+        DesktopServices::openUrl(QUrl(QStringLiteral("https://github.com/Star-knight-code/Star-Client/releases")));
     }
 }
 
@@ -1769,14 +1796,42 @@ void MainWindow::instanceActivated(QModelIndex index)
 
 void MainWindow::on_actionLaunchInstance_triggered()
 {
-    if (m_selectedInstance && !m_selectedInstance->isRunning()) {
-        APPLICATION->launch(m_selectedInstance);
+    if (m_selectedInstance) {
+        launchInstance(m_selectedInstance);
     }
+}
+
+void MainWindow::launchInstance(BaseInstance* instance)
+{
+    if (!instance || instance->isRunning() || !instance->canLaunch()) {
+        return;
+    }
+    // Quick start's memory: the last thing actually launched wins.
+    APPLICATION->settings()->set("LastLaunchedInstance", instance->id());
+    APPLICATION->launch(instance);
+}
+
+void MainWindow::quickLaunch()
+{
+    const QString lastId = APPLICATION->settings()->get("LastLaunchedInstance").toString();
+    BaseInstance* inst = lastId.isEmpty() ? nullptr : APPLICATION->instances()->getInstanceById(lastId);
+    if (!inst)
+        inst = m_selectedInstance;
+    if (!inst && proxymodel && proxymodel->rowCount() > 0) {
+        const QString id = proxymodel->index(0, 0).data(InstanceList::InstanceIDRole).toString();
+        inst = APPLICATION->instances()->getInstanceById(id);
+    }
+    if (!inst || !inst->canLaunch()) {
+        // nothing to launch yet: the first-run move is making an instance
+        on_actionAddInstance_triggered();
+        return;
+    }
+    launchInstance(inst);
 }
 
 void MainWindow::activateInstance(BaseInstance* instance)
 {
-    APPLICATION->launch(instance);
+    launchInstance(instance);
 }
 
 void MainWindow::on_actionKillInstance_triggered()

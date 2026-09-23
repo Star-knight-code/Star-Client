@@ -23,6 +23,7 @@
 
 #include "ui/StarNavRail.h"
 
+class QLabel;
 class QLineEdit;
 class QToolButton;
 class StarPage;
@@ -77,6 +78,8 @@ class StarShell : public QStackedWidget {
    private:
     QWidget* buildHeaderBar();
     void retranslate();
+    /// Recolours the title-strip star from the active palette.
+    void retintBrand();
 
     StarPage* m_page = nullptr;     // the face shown for the rail's page
     QWidget* m_launcherPage = nullptr;
@@ -84,6 +87,7 @@ class StarShell : public QStackedWidget {
     QLineEdit* m_search = nullptr;
     QToolButton* m_quickStart = nullptr;
     QToolButton* m_account = nullptr;
+    QLabel* m_brandMark = nullptr;
 
     QWidget* m_subView = nullptr;   // live sub view, or null
     QString m_accountName;

@@ -55,6 +55,13 @@ AppearanceWidget::AppearanceWidget(bool themesOnly, QWidget* parent)
 
     m_defaultFormat = QTextCharFormat(m_ui->consolePreview->currentCharFormat());
 
+    // Icon themes are gone from Star Client: the rail, the buttons and the
+    // pages draw their own glyphs from the design system instead.
+    m_ui->iconsLabel->hide();
+    m_ui->iconsComboBox->hide();
+    m_ui->iconsFolder->hide();
+    m_ui->iconsComboBox->blockSignals(true);
+
     if (themesOnly) {
         m_ui->catPackLabel->hide();
         m_ui->catPackComboBox->hide();

@@ -1663,6 +1663,8 @@ MainWindow* Application::showMainWindow(bool minimized)
         m_mainWindow = new MainWindow();
         m_mainWindow->restoreState(QByteArray::fromBase64(APPLICATION->settings()->get("MainWindowState").toString().toUtf8()));
         m_mainWindow->restoreGeometry(QByteArray::fromBase64(APPLICATION->settings()->get("MainWindowGeometry").toString().toUtf8()));
+        // restoreState replays saved toolbar visibility; the top chrome stays retired
+        m_mainWindow->hideLegacyChrome();
 
         if (minimized) {
             m_mainWindow->showMinimized();

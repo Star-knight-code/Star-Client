@@ -481,9 +481,11 @@ void InstanceView::paintEvent([[maybe_unused]] QPaintEvent* event)
         auto innerBounds = bounds;
         innerBounds.adjust(10, 10, -10, -10);
 
-        QColor background = QApplication::palette().color(QPalette::WindowText);
-        QColor foreground = QApplication::palette().color(QPalette::Base);
-        foreground.setAlpha(190);
+        // The card follows the theme: dark surface, light text, star accent rim.
+        QColor background = QApplication::palette().color(QPalette::Base);
+        background.setAlpha(235);
+        QColor foreground = QApplication::palette().color(QPalette::WindowText);
+        QColor rim = QApplication::palette().color(QPalette::Highlight);
         painter.setFont(font);
         auto fontMetrics = painter.fontMetrics();
         auto textRect = fontMetrics.boundingRect(innerBounds, Qt::AlignHCenter | Qt::TextWordWrap, emptyString);
@@ -498,8 +500,8 @@ void InstanceView::paintEvent([[maybe_unused]] QPaintEvent* event)
         }
 
         painter.setBrush(QBrush(background));
-        painter.setPen(foreground);
-        painter.drawRoundedRect(wrapRect, 5.0, 5.0);
+        painter.setPen(QPen(rim, 1.5));
+        painter.drawRoundedRect(wrapRect, 8.0, 8.0);
 
         painter.setPen(foreground);
         painter.setFont(font);
