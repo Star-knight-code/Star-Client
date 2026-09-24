@@ -37,6 +37,7 @@
 #pragma once
 
 #include <QAbstractButton>
+#include "ui/themes/StarIcons.h"
 #include <QDialog>
 #include <memory>
 
@@ -54,7 +55,7 @@ class ProxyPage : public QWidget, public BasePage {
     ~ProxyPage();
 
     QString displayName() const override { return tr("Proxy"); }
-    QIcon icon() const override { return QIcon::fromTheme("proxy"); }
+    QIcon icon() const override { return StarIcons::pageIcon(QStringLiteral("network")); }
     QString id() const override { return "proxy-settings"; }
     QString helpPage() const override { return "Proxy-settings"; }
     bool apply() override;

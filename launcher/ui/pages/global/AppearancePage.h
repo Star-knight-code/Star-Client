@@ -36,6 +36,7 @@
 #pragma once
 
 #include <QDialog>
+#include "ui/themes/StarIcons.h"
 #include <QLayout>
 #include "java/JavaChecker.h"
 #include "translations/TranslationsModel.h"
@@ -52,7 +53,7 @@ class AppearancePage : public AppearanceWidget, public BasePage {
     explicit AppearancePage(QWidget* parent = nullptr) : AppearanceWidget(false, parent) { layout()->setContentsMargins(0, 0, 6, 0); }
 
     QString displayName() const override { return tr("Appearance"); }
-    QIcon icon() const override { return QIcon::fromTheme("appearance"); }
+    QIcon icon() const override { return StarIcons::pageIcon(QStringLiteral("droplet")); }
     QString id() const override { return "appearance-settings"; }
     QString helpPage() const override { return "Launcher-settings"; }
 

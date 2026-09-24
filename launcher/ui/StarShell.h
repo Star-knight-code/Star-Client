@@ -18,6 +18,7 @@
 #pragma once
 
 #include <QSizePolicy>
+#include <QPointer>
 #include <QStackedWidget>
 #include <QString>
 
@@ -60,6 +61,9 @@ class StarShell : public QStackedWidget {
     /// The title strip. Cursor is parked in the search box; both signals go up.
     QString searchText() const;
     void setSearchText(const QString& text);
+
+    /// The view body of the page on stage (instances grid, browse grid, ...).
+    QWidget* currentContent() const;
     void setAccountCaption(const QString& name);
 
     /// The hero row of the current page: refresh it after the state changes.
@@ -67,6 +71,8 @@ class StarShell : public QStackedWidget {
 
    signals:
     void searchChanged(const QString& text);
+    /// Enter in the search box: navigate-and-search semantics live upstairs.
+    void searchSubmitted(const QString& text);
     void quickStartRequested();
     void accountRequested();
     void subPageBack();
@@ -90,6 +96,7 @@ class StarShell : public QStackedWidget {
     QLabel* m_brandMark = nullptr;
 
     QWidget* m_subView = nullptr;   // live sub view, or null
+    QPointer<QWidget> m_content;    // the body of the current page
     QString m_accountName;
     QString m_pageTitle;            // remembered so a back restores the title
     QString m_pageSubtitle;

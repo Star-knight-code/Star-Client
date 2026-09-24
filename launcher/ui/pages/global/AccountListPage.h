@@ -37,6 +37,7 @@
 #pragma once
 
 #include <QMainWindow>
+#include "ui/themes/StarIcons.h"
 #include <memory>
 
 #include "ui/pages/BasePage.h"
@@ -58,7 +59,7 @@ class AccountListPage : public QMainWindow, public BasePage {
     QString displayName() const override { return tr("Accounts"); }
     QIcon icon() const override
     {
-        auto icon = QIcon::fromTheme("accounts");
+        auto icon = StarIcons::pageIcon(QStringLiteral("users"));
         if (icon.isNull()) {
             icon = QIcon::fromTheme("noaccount");
         }

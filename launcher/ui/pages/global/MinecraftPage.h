@@ -36,6 +36,7 @@
 #pragma once
 
 #include <QDialog>
+#include "ui/themes/StarIcons.h"
 #include <memory>
 
 #include "java/JavaChecker.h"
@@ -52,7 +53,7 @@ class MinecraftPage : public MinecraftSettingsWidget, public BasePage {
     ~MinecraftPage() override {}
 
     QString displayName() const override { return tr("Minecraft"); }
-    QIcon icon() const override { return QIcon::fromTheme("minecraft"); }
+    QIcon icon() const override { return StarIcons::pageIcon(QStringLiteral("cube")); }
     QString id() const override { return "minecraft-settings"; }
     QString helpPage() const override { return "Minecraft-settings"; }
     bool apply() override

@@ -870,6 +870,8 @@ SET(LAUNCHER_SOURCES
     ui/themes/CustomTheme.h
     ui/themes/DarkTheme.cpp
     ui/themes/DarkTheme.h
+    ui/themes/StarIcons.cpp
+    ui/themes/StarIcons.h
     ui/themes/StarTheme.cpp
     ui/themes/StarTheme.h
     ui/StarNavRail.cpp
@@ -880,6 +882,8 @@ SET(LAUNCHER_SOURCES
     ui/StarShell.h
     ui/views/StarHomeView.cpp
     ui/views/StarHomeView.h
+    ui/views/StarBrowseView.cpp
+    ui/views/StarBrowseView.h
     ui/views/StarPlaceholderView.cpp
     ui/views/StarPlaceholderView.h
     ui/themes/ITheme.cpp

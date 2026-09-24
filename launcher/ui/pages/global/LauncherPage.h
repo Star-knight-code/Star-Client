@@ -36,6 +36,7 @@
 #pragma once
 
 #include <QDialog>
+#include "ui/themes/StarIcons.h"
 #include <memory>
 
 #include <translations/TranslationsModel.h>
@@ -57,7 +58,7 @@ class LauncherPage : public QWidget, public BasePage {
     ~LauncherPage();
 
     QString displayName() const override { return tr("General"); }
-    QIcon icon() const override { return QIcon::fromTheme("settings"); }
+    QIcon icon() const override { return StarIcons::pageIcon(QStringLiteral("sliders")); }
     QString id() const override { return "launcher-settings"; }
     QString helpPage() const override { return "Launcher-settings"; }
     bool apply() override;

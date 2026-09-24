@@ -37,6 +37,7 @@
 #pragma once
 
 #include <QWidget>
+#include "ui/themes/StarIcons.h"
 #include <memory>
 #include "ui/pages/BasePage.h"
 
@@ -50,7 +51,7 @@ class LanguagePage : public QWidget, public BasePage {
     virtual ~LanguagePage();
 
     QString displayName() const override { return tr("Language"); }
-    QIcon icon() const override { return QIcon::fromTheme("language"); }
+    QIcon icon() const override { return StarIcons::pageIcon(QStringLiteral("translate")); }
     QString id() const override { return "language-settings"; }
     QString helpPage() const override { return "Language-settings"; }
     bool apply() override;

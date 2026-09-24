@@ -38,6 +38,7 @@
 #pragma once
 
 #include <QWidget>
+#include "ui/themes/StarIcons.h"
 
 #include "ui/pages/BasePage.h"
 
@@ -53,7 +54,7 @@ class APIPage : public QWidget, public BasePage {
     ~APIPage();
 
     QString displayName() const override { return tr("Services"); }
-    QIcon icon() const override { return QIcon::fromTheme("worlds"); }
+    QIcon icon() const override { return StarIcons::pageIcon(QStringLiteral("globe")); }
     QString id() const override { return "apis"; }
     QString helpPage() const override { return "APIs"; }
     virtual bool apply() override;

@@ -69,6 +69,8 @@ QWidget* StarShell::buildHeaderBar()
     m_search->setClearButtonEnabled(true);
     m_search->setPlaceholderText(tr("Search instances, worlds, mods"));
     connect(m_search, &QLineEdit::textChanged, this, &StarShell::searchChanged);
+    connect(m_search, &QLineEdit::returnPressed, this,
+            [this] { emit searchSubmitted(m_search->text()); });
     row->addWidget(m_search, 1);
 
     m_quickStart = new QToolButton(m_headerBar);
@@ -132,6 +134,7 @@ StarPage* StarShell::showPage(StarNavRail::Page page, QWidget* view, const QStri
     column->addWidget(view, 1);
     view->setVisible(true);
     m_page->setBody(inner);
+    m_content = view;
 
     addWidget(m_page);
     setCurrentWidget(m_page);
@@ -145,6 +148,11 @@ StarPage* StarShell::showPage(StarNavRail::Page page, QWidget* view, const QStri
 StarPage* StarShell::currentPage() const
 {
     return m_page;
+}
+
+QWidget* StarShell::currentContent() const
+{
+    return m_content;
 }
 
 StarNavRail::Page StarShell::currentRailPage() const

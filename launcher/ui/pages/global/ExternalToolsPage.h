@@ -36,6 +36,7 @@
 #pragma once
 
 #include <QWidget>
+#include "ui/themes/StarIcons.h"
 
 #include "ui/pages/BasePage.h"
 
@@ -53,7 +54,7 @@ class ExternalToolsPage : public QWidget, public BasePage {
     QString displayName() const override { return tr("Tools"); }
     QIcon icon() const override
     {
-        auto icon = QIcon::fromTheme("externaltools");
+        auto icon = StarIcons::pageIcon(QStringLiteral("wrench"));
         if (icon.isNull()) {
             icon = QIcon::fromTheme("loadermods");
         }

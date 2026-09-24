@@ -36,6 +36,7 @@
 #pragma once
 
 #include <QObjectPtr.h>
+#include "ui/themes/StarIcons.h"
 #include <QDialog>
 #include <QStringListModel>
 #include "JavaCommon.h"
@@ -56,7 +57,7 @@ class JavaPage : public QWidget, public BasePage {
     ~JavaPage();
 
     QString displayName() const override { return tr("Java"); }
-    QIcon icon() const override { return QIcon::fromTheme("java"); }
+    QIcon icon() const override { return StarIcons::pageIcon(QStringLiteral("coffee")); }
     QString id() const override { return "java-settings"; }
     QString helpPage() const override { return "Java-settings"; }
     void retranslate() override;

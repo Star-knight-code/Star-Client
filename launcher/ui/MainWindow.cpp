@@ -113,6 +113,7 @@
 #include "ui/instanceview/InstanceView.h"
 #include "ui/views/StarPlaceholderView.h"
 #include "ui/views/StarHomeView.h"
+#include "ui/views/StarBrowseView.h"
 #include "ui/themes/ITheme.h"
 #include "ui/themes/ThemeManager.h"
 #include "ui/widgets/LabeledToolButton.h"
@@ -363,8 +364,22 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
             m_activePage = m_shell->showPage(StarNavRail::Page::Instances, view,
                                              tr("Instances"), tr("Launch and manage your Minecraft installs."));
 
-            connect(m_shell, &StarShell::searchChanged, this,
-                    [this](const QString& needle) { setInstanceSearchTerm(needle); });
+            connect(m_shell, &StarShell::searchChanged, this, [this](const QString& needle) {
+                // Browse owns the search while it sits on stage: the strip
+                // becomes the catalogue's own search box.
+                if (m_shell->currentRailPage() == StarNavRail::Page::Browse) {
+                    if (auto* browseView = qobject_cast<StarBrowseView*>(m_shell->currentContent())) {
+                        browseView->search(needle);
+                    }
+                    return;
+                }
+                setInstanceSearchTerm(needle);
+            });
+            connect(m_shell, &StarShell::searchSubmitted, this, [this](const QString&) {
+                // Enter always means "search the catalogue" - the
+                // Modrinth-style browse page, even from instances.
+                showStarBrowsePage();
+            });
             connect(m_shell, &StarShell::quickStartRequested, this, &MainWindow::quickLaunch);
             connect(m_shell, &StarShell::accountRequested, this,
                     &MainWindow::on_actionManageAccounts_triggered);
@@ -741,17 +756,22 @@ void MainWindow::showStarStartPage()
 void MainWindow::showStarBrowsePage()
 {
     m_navRail->setCurrentPage(StarNavRail::Page::Browse);
-
-    if (m_shell) {
-        auto* ph = new StarPlaceholderView(StarNavRail::Page::Browse);
-        auto* cta = ph->callToAction();
-        cta->setText(tr("Browse modpacks"));
-        cta->setVisible(true);
-        m_shell->showPage(StarNavRail::Page::Browse, ph, tr("Browse content"),
-                          tr("Install modpacks, mods, resource packs, worlds and shaders."));
-        connect(cta, &QToolButton::clicked, this,
-                [this] { on_actionAddInstance_triggered(); });
+    if (!m_shell) {
+        return;
     }
+
+    auto* browseView = new StarBrowseView();
+    connect(browseView, &StarBrowseView::installRequested, this, [this](const QUrl& url, const QString&) {
+        processURLs({ url });
+    });
+    connect(browseView, &StarBrowseView::openRequested, this,
+            [](const QUrl& url) { DesktopServices::openUrl(url); });
+
+    m_shell->showPage(StarNavRail::Page::Browse, browseView, tr("Browse content"),
+                      tr("Type above to search Modrinth; modpacks install in one click."));
+
+    // whatever the strip already holds becomes the search, popular packs otherwise
+    browseView->search(m_shell->searchText());
 }
 
 void MainWindow::showStarAccountsPage()

@@ -64,7 +64,7 @@ StarPlaceholderView::StarPlaceholderView(StarNavRail::Page page, QWidget* parent
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
     auto* column = new QVBoxLayout(this);
-    column->setContentsMargins(40, 40, 40, 40);
+    column->setContentsMargins(32, 32, 32, 32);
     column->setSpacing(0);
 
     column->addStretch(1);
@@ -78,6 +78,7 @@ StarPlaceholderView::StarPlaceholderView(StarNavRail::Page page, QWidget* parent
     m_heading = new QLabel(heading(), this);
     m_heading->setProperty("starRole", QStringLiteral("h1"));
     m_heading->setAlignment(Qt::AlignCenter);
+    m_heading->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
     column->addWidget(m_heading, 0, Qt::AlignHCenter);
 
     column->addSpacing(10);
@@ -87,6 +88,7 @@ StarPlaceholderView::StarPlaceholderView(StarNavRail::Page page, QWidget* parent
     m_blurb->setAlignment(Qt::AlignCenter);
     m_blurb->setWordWrap(true);
     m_blurb->setMaximumWidth(660);
+    m_blurb->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
     column->addWidget(m_blurb, 0, Qt::AlignHCenter);
 
     column->addSpacing(30);
@@ -97,7 +99,7 @@ StarPlaceholderView::StarPlaceholderView(StarNavRail::Page page, QWidget* parent
     m_cta->setVisible(false);
     column->addWidget(m_cta, 0, Qt::AlignHCenter);
 
-    column->addStretch(3);
+    column->addStretch(1);
 
     retint();
 }
@@ -137,7 +139,11 @@ QString StarPlaceholderView::blurb() const
 
 void StarPlaceholderView::retint()
 {
-    m_star->setPixmap(accentStar(palette().color(QPalette::Highlight), 72));
+    // The mark keeps the launcher's star colour: white on the dark themes,
+    // ink on the light ones; it is not a place for the accent.
+    const QColor window = QApplication::palette().color(QPalette::Window);
+    const QColor star = window.lightness() > 128 ? QColor(0x0F, 0x13, 0x1C) : QColor(Qt::white);
+    m_star->setPixmap(accentStar(star, 72));
 }
 
 void StarPlaceholderView::changeEvent(QEvent* event)
