@@ -78,7 +78,7 @@ StarBrowseView::StarBrowseView(QWidget* parent) : QWidget(parent)
     tabs->setContentsMargins(0, 0, 0, 10);
     tabs->setSpacing(10);
 
-    auto* makeTab = [this](const QString& text) -> QToolButton* {
+    auto makeTab = [this](const QString& text) -> QToolButton* {
         auto* button = new QToolButton(this);
         button->setProperty("starRole", QStringLiteral("pill"));
         button->setCheckable(true);
@@ -139,8 +139,8 @@ void StarBrowseView::setProjectType(const QString& projectType)
         return;
     }
     m_projectType = projectType;
-    m_modpacksTab->setChecked(projectType == QLatin1String("modpack"));
-    m_modsTab->setChecked(projectType == QLatin1String("mod"));
+    m_modpacksTab->setChecked(projectType == QStringLiteral("modpack"));
+    m_modsTab->setChecked(projectType == QStringLiteral("mod"));
     performSearch();
 }
 
@@ -216,7 +216,7 @@ void StarBrowseView::showResults()
     setStatus(m_query.isEmpty() ? tr("Popular on Modrinth right now.")
                                 : tr("%1 result(s) on Modrinth for %2").arg(m_results.size()).arg(m_query));
 
-    const bool modpacks = m_projectType == QLatin1String("modpack");
+    const bool modpacks = m_projectType == QStringLiteral("modpack");
     int columnCount = 2;
     for (int i = 0; i < m_results.size(); ++i) {
         const Result& result = m_results.at(i);
@@ -338,7 +338,7 @@ void StarBrowseView::requestVersionsAndInstall(const QString& projectId, const Q
             for (const QJsonValue& entry : files) {
                 const QJsonObject file = entry.toObject();
                 const QString fileUrl = file.value(QStringLiteral("url")).toString();
-                if (fileUrl.endsWith(QLatin1String(".mrpack"))) {
+                if (fileUrl.endsWith(QStringLiteral(".mrpack"))) {
                     setStatus(tr("Handing %1 to the installer ...").arg(title));
                     emit installRequested(QUrl(fileUrl), title);
                     return;
