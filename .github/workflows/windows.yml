@@ -1,0 +1,230 @@
+name: Build (Windows)
+
+# Windows x64 release build. Publishes a portable .zip and an installer .exe.
+#
+# Reuses the inherited upstream setup-dependencies action and the windows_msvc
+# CMake preset, so the toolchain matches what the base project already tests.
+# Code signing is skipped when the signing secrets are absent - the workflow
+# still produces working (unsigned) archives, which is what a fork needs.
+
+on:
+  push:
+    branches: ["main", "arena/**"]
+    tags: ["v*"]
+  pull_request:
+    branches: ["main"]
+  workflow_dispatch:
+    inputs:
+      build-type:
+        description: Type of build
+        type: choice
+        options: [Release, Debug]
+        default: Release
+      version:
+        description: Version string to embed
+        type: string
+        default: ""
+      publish:
+        description: Attach the artifacts to a draft release
+        type: boolean
+        default: false
+
+concurrency:
+  group: windows-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  build-windows:
+    name: Build (Windows x64)
+    runs-on: windows-2022
+    timeout-minutes: 120
+
+    env:
+      ARTIFACT_NAME: Windows-MSVC
+      BUILD_PLATFORM: starclient
+      BUILD_TYPE: ${{ inputs.build-type || 'Release' }}
+      CMAKE_PRESET: windows_msvc
+      STARCLIENT_VERSION: ${{ inputs.version || '' }}
+      QT_VERSION: "6.10.2"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Setup dependencies
+        uses: ./.github/actions/setup-dependencies
+        with:
+          build-type: ${{ env.BUILD_TYPE }}
+          artifact-name: ${{ env.ARTIFACT_NAME }}
+          vcvars-arch: amd64
+          qt-version: ${{ env.QT_VERSION }}
+
+      - name: Configure
+        shell: pwsh
+        run: cmake --preset "$env:CMAKE_PRESET"
+
+      - name: Build
+        shell: pwsh
+        run: cmake --build --preset "$env:CMAKE_PRESET" --config "$env:BUILD_TYPE"
+
+      # CI logs are not always retrievable from outside, so a failed build
+      # re-runs the build to capture the compiler diagnostics, surfaces them as
+      # workflow annotations and attaches the full text to the commit.
+      - name: Report build failure
+        if: failure()
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set +e
+          cmake --build --preset "$CMAKE_PRESET" --config "$BUILD_TYPE" > build-output.log 2>&1
+          echo "rebuild exited with $?"
+
+          {
+            echo '### Build failure diagnostics'
+            echo
+            echo '```'
+            grep -n -iE 'error|fatal' build-output.log | head -80
+            echo '```'
+            echo
+            echo '<details><summary>Last 120 lines</summary>'
+            echo
+            echo '```'
+            tail -120 build-output.log
+            echo '```'
+            echo '</details>'
+          } > build-diagnostics.md
+
+          head -c 60000 build-diagnostics.md > build-diagnostics.small.md
+          gh api -X POST "repos/${GITHUB_REPOSITORY}/commits/${GITHUB_SHA}/comments" \
+            -F body=@build-diagnostics.small.md || echo "could not attach the log to the commit"
+
+          start=$(grep -n -iE 'error' build-output.log | head -1 | cut -d: -f1)
+          if [ -n "$start" ]; then
+            end=$((start + 12))
+            block=$(sed -n "${start},${end}p" build-output.log)
+            block=${block//'%'/'%25'}
+            block=${block//$'\r'/}
+            block=${block//$'\n'/'%0A'}
+            echo "::error title=Windows build failure::${block}"
+          fi
+          grep -n -iE 'error' build-output.log | tail -5
+
+      # The upstream packaging action handles the install tree, windeployqt,
+      # the portable component and the NSIS installer. Signing steps are
+      # guarded on secrets we do not have, so they are skipped cleanly.
+      - name: Package
+        uses: ./.github/actions/package/windows
+        with:
+          version: ${{ inputs.version || github.sha }}
+          build-type: ${{ env.BUILD_TYPE }}
+          artifact-name: ${{ env.ARTIFACT_NAME }}
+          azure-client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          azure-tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          azure-subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Rename artifacts to Star Client names
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # A failure here is invisible in the job log, so report it explicitly.
+          try {
+          $version = "${{ inputs.version }}"
+          if (-not $version) {
+            # a tag like v0.1.0 names the release, otherwise fall back to the commit
+            $version = if ("${{ github.ref_type }}" -eq "tag") { "${{ github.ref_name }}" } else { "${{ github.sha }}".Substring(0, 7) }
+          }
+          Write-Host "packaging version: $version"
+
+          # the archives are written into dist/, which does not exist yet
+          New-Item -ItemType Directory -Path dist -Force | Out-Null
+
+          # portable zip -> StarClient-<version>-windows-x64-portable.zip
+          if (-not (Test-Path install-portable)) {
+            Write-Warning "no install-portable tree found"
+          } elseif (-not (Get-ChildItem -Path install-portable -Recurse -File -ErrorAction SilentlyContinue)) {
+            Write-Warning "install-portable is empty"
+          } else {
+            Compress-Archive -Path install-portable/* `
+              -DestinationPath "dist/StarClient-$version-windows-x64-portable.zip" -Force -ErrorAction Stop
+            Write-Host "portable archive written"
+          }
+
+          # NSIS installer -> StarClient-<version>-windows-x64-setup.exe
+          $installer = Get-ChildItem -Path . -Filter "*-Setup.exe" -File -ErrorAction SilentlyContinue |
+                       Select-Object -First 1
+          if ($installer) {
+            Copy-Item $installer.FullName "dist/StarClient-$version-windows-x64-setup.exe" -Force
+            Write-Host "installer copied: $($installer.Name)"
+          } else {
+            Write-Warning "no installer exe found (NSIS may not have run)"
+          }
+          } catch {
+            $message = $_ | Out-String
+            Write-Host $message
+            $escaped = $message.Replace('%', '%25').Replace("`r", '').Replace("`n", '%0A')
+            if ($escaped.Length -gt 600) { $escaped = $escaped.Substring(0, 600) }
+            Write-Host "::error title=Packaging failed::$escaped"
+            $message | Out-File -FilePath packaging-error.md -Encoding utf8
+            gh api -X POST "repos/$env:GITHUB_REPOSITORY/commits/$env:GITHUB_SHA/comments" `
+              -F body=@packaging-error.md
+            throw
+          }
+
+      - name: Verify the archives
+        shell: pwsh
+        run: |
+          Get-ChildItem dist | ForEach-Object {
+            Write-Host ("  {0}  {1:N2} MB" -f $_.Name, ($_.Length / 1MB))
+          }
+          if (-not (Get-ChildItem dist -Filter *.zip) -and -not (Get-ChildItem dist -Filter *.exe)) {
+            throw "no artifacts were produced"
+          }
+
+      - name: Upload portable zip
+        uses: actions/upload-artifact@v4
+        with:
+          name: StarClient-windows-x64-portable
+          path: dist/*.zip
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Upload installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: StarClient-windows-x64-setup
+          path: dist/*.exe
+          if-no-files-found: warn
+          retention-days: 30
+
+      # Source archives live in the repo; Releases carry only built artifacts.
+      - name: Publish to a draft release
+        if: ${{ startsWith(github.ref, 'refs/tags/v') || inputs.publish == true }}
+        uses: softprops/action-gh-release@v2
+        with:
+          draft: true
+          tag_name: ${{ startsWith(github.ref, 'refs/tags/v') && github.ref_name || format('v{0}', inputs.version || github.sha) }}
+          name: "Star Client ${{ inputs.version || github.ref_name }}"
+          files: |
+            dist/*.zip
+            dist/*.exe
+          body: |
+            ## Star Client — portable Windows build
+
+            **Portable:** download `StarClient-*-windows-x64-portable.zip`, unzip
+            anywhere, run `StarClient.exe`. Nothing is installed and nothing is
+            written outside the extracted folder.
+
+            **Installer:** download `StarClient-*-windows-x64-setup.exe` if you
+            want a Start Menu entry and an uninstaller.
+
+            Requirements: 64-bit Windows 10+, Java 17+ (21 recommended).
+
+            Star Client is free software under the GNU GPL v3.0.
+            See `CREDITS.md` in the source for attribution.

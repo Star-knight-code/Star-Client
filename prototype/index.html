@@ -1,0 +1,1245 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="oled" data-accent="starlight">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Star Client</title>
+<meta name="description" content="Star Client - a fast, lightweight Minecraft launcher.">
+<link rel="icon" href="../branding/svg/star-mark-color.svg">
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+
+<!-- ===================================================================== -->
+<!-- Icon + logo sprite                                                     -->
+<!-- ===================================================================== -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <!-- used to paint the star with a CSS gradient (see .titlebar__brand svg.star):
+         var() cannot be resolved inside an SVG gradient referenced by <use> -->
+    <style>
+      :root {
+        --star-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Cpath d='M128 16Q150.4 105.6 240 128Q150.4 150.4 128 240Q105.6 150.4 16 128Q105.6 105.6 128 16Z'/%3E%3C/svg%3E");
+      }
+    </style>
+    <linearGradient id="starGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="var(--sc-gradient-from)"/>
+      <stop offset=".55" stop-color="var(--sc-accent)"/>
+      <stop offset="1" stop-color="var(--sc-gradient-to)"/>
+    </linearGradient>
+
+    <!-- the four-pointed star mark -->
+    <symbol id="i-star" viewBox="0 0 256 256">
+      <path d="M128 16Q150.4 105.6 240 128Q150.4 150.4 128 240Q105.6 150.4 16 128Q105.6 105.6 128 16Z"/>
+    </symbol>
+    <symbol id="i-star-gradient" viewBox="0 0 256 256">
+      <path d="M128 16Q150.4 105.6 240 128Q150.4 150.4 128 240Q105.6 150.4 16 128Q105.6 105.6 128 16Z" fill="url(#starGrad)"/>
+    </symbol>
+
+    <!-- ui icons, 24x24 stroke set -->
+    <symbol id="i-home" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9.5V21h13V9.5"/><path d="M9.5 21v-6h5v6"/></symbol>
+    <symbol id="i-grid" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7.5" height="7.5" rx="2"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="2"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="2"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="2"/></symbol>
+    <symbol id="i-compass" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m15.5 8.5-2 5-5 2 2-5z"/></symbol>
+    <symbol id="i-users" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 20v-1.5a3.5 3.5 0 0 0-3.5-3.5h-5A3.5 3.5 0 0 0 4 18.5V20"/><circle cx="10" cy="8" r="3.4"/><path d="M20 20v-1.4a3.4 3.4 0 0 0-2.6-3.3"/><path d="M15.5 5a3.4 3.4 0 0 1 0 6.4"/></symbol>
+    <symbol id="i-cog" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1A1.7 1.7 0 0 0 8.9 19a1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1A1.7 1.7 0 0 0 5 8.9a1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9.4a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9v.1a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/></symbol>
+    <symbol id="i-play" viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l13-7.5z"/></symbol>
+    <symbol id="i-stop" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="2.5"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-more" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="12" cy="19" r="1.7"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="m6 6 12 12M18 6 6 18"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m4 12.5 5.2 5.2L20 7"/></symbol>
+    <symbol id="i-check-circle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m8 12.4 2.6 2.6L16 9.6"/></symbol>
+    <symbol id="i-alert" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 4.3 2.6 17.5A2 2 0 0 0 4.3 20.5h15.4a2 2 0 0 0 1.7-3L13.7 4.3a2 2 0 0 0-3.4 0Z"/><path d="M12 9.5v4M12 17h.01"/></symbol>
+    <symbol id="i-info" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5.5M12 7.8h.01"/></symbol>
+    <symbol id="i-spark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4.5 13.5H11l-1 8.5 8.5-11.5H12l1-8.5Z"/></symbol>
+    <symbol id="i-cpu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="6" width="12" height="12" rx="3"/><path d="M9.5 9.5h5v5h-5z"/><path d="M9 2v3M15 2v3M9 19v3M15 19v3M2 9h3M2 15h3M19 9h3M19 15h3"/></symbol>
+    <symbol id="i-memory" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="10" rx="2.5"/><path d="M6 11v2M10 11v2M14 11v2M18 11v2"/></symbol>
+    <symbol id="i-palette" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 1 0 0 18 2 2 0 0 0 1.6-3.2 2 2 0 0 1 1.6-3.2H18A3 3 0 0 0 21 11.6 9 9 0 0 0 12 3Z"/><circle cx="7.6" cy="11.5" r="1.1" fill="currentColor" stroke="none"/><circle cx="10.4" cy="7.6" r="1.1" fill="currentColor" stroke="none"/><circle cx="15.4" cy="8.4" r="1.1" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="i-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5Z"/></symbol>
+    <symbol id="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M19.1 4.9l-1.8 1.8M6.7 17.3l-1.8 1.8"/></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v11"/><path d="m7.5 10 4.5 4.5L16.5 10"/><path d="M4 19h16"/></symbol>
+    <symbol id="i-folder" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7.5A2.5 2.5 0 0 1 5.5 5h3.2a2 2 0 0 1 1.7.9l.6 1a2 2 0 0 0 1.7.9h5.8A2.5 2.5 0 0 1 21 10.3v6.2A2.5 2.5 0 0 1 18.5 19h-13A2.5 2.5 0 0 1 3 16.5z"/></symbol>
+    <symbol id="i-box" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m12 2.8 8 4.4v9.6l-8 4.4-8-4.4V7.2z"/><path d="m4 7.2 8 4.4 8-4.4M12 21.2v-9.6"/></symbol>
+    <symbol id="i-puzzle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3.5a2 2 0 0 1 4 0V5h3.5a1.5 1.5 0 0 1 1.5 1.5V10h1.5a2 2 0 0 1 0 4H19v3.5a1.5 1.5 0 0 1-1.5 1.5H14v-1.5a2 2 0 0 0-4 0V19H6.5A1.5 1.5 0 0 1 5 17.5V14H3.5a2 2 0 0 1 0-4H5V6.5A1.5 1.5 0 0 1 6.5 5H10z"/></symbol>
+    <symbol id="i-globe" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3.5 9h17M3.5 15h17"/><path d="M12 3a14 14 0 0 1 0 18 14 14 0 0 1 0-18Z"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 5 6v6c0 4 2.9 7.7 7 9 4.1-1.3 7-5 7-9V6z"/><path d="m9 12 2.2 2.2L15.5 10"/></symbol>
+    <symbol id="i-terminal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="4" width="19" height="16" rx="2.5"/><path d="m7 9.5 2.5 2.5L7 14.5M12.5 15h4.5"/></symbol>
+    <symbol id="i-layers" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3 9 5-9 5-9-5z"/><path d="m3 13 9 5 9-5"/></symbol>
+    <symbol id="i-refresh" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.4-5.7"/><path d="M20 4.5V10h-5.5"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7.5V12l3 2"/></symbol>
+    <symbol id="i-chevron-l" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m14.5 6-6 6 6 6"/></symbol>
+    <symbol id="i-chevron-r" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9.5 6 6 6-6 6"/></symbol>
+    <symbol id="i-leaf" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20c0-9 6-15 16-16 1 10-4 16-13 16H4Z"/><path d="M4 20c3-4 6.5-6.5 11-8"/></symbol>
+    <symbol id="i-key" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="15" r="4"/><path d="m11 12 8-8M17 3l3 3-2 2-3-3"/></symbol>
+    <symbol id="i-wrench" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15.5 3a5.5 5.5 0 0 0-4.9 8L3 18.6 5.4 21l7.6-7.6A5.5 5.5 0 0 0 20 8.5l-3 1.8-2.3-2.3z"/></symbol>
+
+    <!-- blocky instance art -->
+    <symbol id="art-grass" viewBox="0 0 64 64"><rect width="64" height="64" fill="#5A8A3C"/><rect y="0" width="64" height="18" fill="#7CBF4E"/><rect x="0" y="18" width="64" height="8" fill="#6BA83F"/><rect x="8" y="34" width="10" height="10" fill="#4E7A33"/><rect x="34" y="42" width="12" height="12" fill="#4E7A33"/><rect x="46" y="26" width="8" height="8" fill="#456D2C"/></symbol>
+    <symbol id="art-creeper" viewBox="0 0 64 64"><rect width="64" height="64" fill="#2F7D3A"/><rect x="14" y="16" width="12" height="12" fill="#0C1A0E"/><rect x="38" y="16" width="12" height="12" fill="#0C1A0E"/><rect x="26" y="30" width="12" height="16" fill="#0C1A0E"/><rect x="18" y="40" width="8" height="12" fill="#0C1A0E"/><rect x="38" y="40" width="8" height="12" fill="#0C1A0E"/></symbol>
+    <symbol id="art-nether" viewBox="0 0 64 64"><rect width="64" height="64" fill="#5B1A1A"/><rect x="0" y="0" width="64" height="6" fill="#8C2B22"/><rect x="10" y="12" width="18" height="8" fill="#7A241C"/><rect x="36" y="24" width="22" height="10" fill="#7A241C"/><rect x="6" y="40" width="26" height="12" fill="#7A241C"/><rect x="42" y="46" width="16" height="10" fill="#93321F"/></symbol>
+    <symbol id="art-end" viewBox="0 0 64 64"><rect width="64" height="64" fill="#0E0B18"/><rect x="8" y="10" width="48" height="44" rx="4" fill="#1B1533"/><rect x="18" y="20" width="28" height="24" fill="#C9B6F5"/><rect x="24" y="26" width="16" height="12" fill="#1B1533"/><rect x="30" y="30" width="4" height="4" fill="#E9DFFB"/></symbol>
+    <symbol id="art-sky" viewBox="0 0 64 64"><rect width="64" height="64" fill="#4A8FD1"/><rect y="34" width="64" height="30" fill="#8ED16F"/><rect x="10" y="40" width="14" height="14" fill="#6FB853"/><rect x="40" y="44" width="16" height="16" fill="#6FB853"/><circle cx="46" cy="16" r="8" fill="#FFE9A8"/></symbol>
+    <symbol id="art-tech" viewBox="0 0 64 64"><rect width="64" height="64" fill="#14202E"/><rect x="6" y="6" width="52" height="52" rx="6" fill="#1B2C40"/><rect x="16" y="16" width="32" height="32" rx="4" fill="#4FC3F7"/><rect x="24" y="24" width="16" height="16" fill="#14202E"/><rect x="29" y="29" width="6" height="6" fill="#9BE1FF"/></symbol>
+  </defs>
+</svg>
+
+<div class="app">
+
+  <!-- =================================================================== -->
+  <!-- Navigation rail                                                      -->
+  <!-- =================================================================== -->
+  <nav class="rail" aria-label="Main navigation">
+    <div class="rail__logo" title="Star Client" data-goto="home">
+      <svg class="star" viewBox="0 0 256 256" fill="currentColor" aria-label="Star Client"><use href="#i-star"/></svg>
+    </div>
+
+    <button class="rail__btn" data-goto="home"      data-tip="Star Start"    aria-label="Star Start"><svg><use href="#i-home"/></svg></button>
+    <button class="rail__btn" data-goto="instances" data-tip="Instances"     aria-label="Instances"><svg><use href="#i-grid"/></svg></button>
+    <button class="rail__btn" data-goto="browse"    data-tip="Browse content" aria-label="Browse content"><svg><use href="#i-compass"/></svg></button>
+    <button class="rail__btn" data-goto="accounts"  data-tip="Accounts"      aria-label="Accounts"><svg><use href="#i-users"/></svg></button>
+
+    <div class="rail__sep"></div>
+
+    <div class="rail__spacer"></div>
+
+    <button class="rail__btn" id="themeToggle" data-tip="Switch appearance" aria-label="Switch appearance"><svg><use href="#i-moon"/></svg></button>
+    <button class="rail__btn" data-goto="settings" data-tip="Settings" aria-label="Settings"><svg><use href="#i-cog"/></svg></button>
+  </nav>
+
+  <!-- =================================================================== -->
+  <!-- Title bar                                                            -->
+  <!-- =================================================================== -->
+  <header class="titlebar">
+    <div class="titlebar__brand">
+      <svg class="star" viewBox="0 0 256 256" fill="currentColor"><use href="#i-star"/></svg>
+      <span>Star <span class="brand-client">Client</span></span>
+    </div>
+
+    <label class="titlebar__search">
+      <svg><use href="#i-search"/></svg>
+      <input type="search" placeholder="Search instances, mods, modpacks…" id="globalSearch" aria-label="Search">
+    </label>
+
+    <div class="titlebar__spacer"></div>
+
+    <button class="chip" id="quickStartChip"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><use href="#i-spark"/></svg>Quick Start</button>
+
+    <div class="account-chip" data-goto="accounts">
+      <div class="account-chip__skin"></div>
+      <div>
+        <div class="account-chip__name">StarKnight</div>
+        <div class="account-chip__type">Microsoft</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- =================================================================== -->
+  <!-- Content                                                              -->
+  <!-- =================================================================== -->
+  <main class="content" id="content">
+
+    <!-- ------------------------------------------------------- Star Start -->
+    <section class="page is-active" id="page-home">
+      <div class="hero">
+        <svg class="hero__star" viewBox="0 0 256 256" fill="currentColor" style="color:var(--sc-accent)"><use href="#i-star"/></svg>
+        <div class="hero__body">
+          <div class="hero__eyebrow"><svg width="13" height="13" viewBox="0 0 256 256" fill="currentColor"><use href="#i-star"/></svg> Star Start</div>
+          <h1 class="hero__title">Ready for lift-off, <em>StarKnight</em>.</h1>
+          <p class="hero__desc" id="heroDesc">Star Client 21.1 · Fabric 0.16.9 · 87 mods loaded · 6.2 GB allocated</p>
+          <div class="hero__actions">
+            <button class="btn btn--launch" id="heroLaunch">
+              <svg><use href="#i-play"/></svg>
+              <span>Launch Star Client</span>
+            </button>
+            <button class="btn btn--ghost" data-goto="instances">Choose another instance</button>
+          </div>
+          <div class="hero__meta">
+            <div class="hero__stat"><b id="heroRam">6144 MB</b><span>Heap</span></div>
+            <div class="hero__stat"><b id="heroGc">G1GC</b><span>Collector</span></div>
+            <div class="hero__stat"><b>Java 21</b><span>Runtime</span></div>
+            <div class="hero__stat"><b id="heroFootprint">118 MB</b><span>Launcher RAM</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid--3 section">
+        <div class="card card--pad-sm">
+          <div class="card__head">
+            <div><h3 class="card__title">Recent worlds</h3><p class="card__desc">Jump straight back in</p></div>
+          </div>
+          <div class="stack">
+            <button class="btn btn--ghost" style="justify-content:flex-start" data-toast="Joining Star Client SMP">
+              <svg><use href="#i-globe"/></svg>Star Client SMP <span class="right muted mono">2h ago</span>
+            </button>
+            <button class="btn btn--ghost" style="justify-content:flex-start" data-toast="Joining Skyblock">
+              <svg><use href="#i-leaf"/></svg>Skyblock Islands <span class="right muted mono">yesterday</span>
+            </button>
+            <button class="btn btn--ghost" style="justify-content:flex-start" data-toast="Joining Creative">
+              <svg><use href="#i-box"/></svg>Creative Flat <span class="right muted mono">3d ago</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="card card--pad-sm">
+          <div class="card__head">
+            <div><h3 class="card__title">Launcher footprint</h3><p class="card__desc">Star Client is built to stay small</p></div>
+            <span class="badge badge--success">-64%</span>
+          </div>
+          <div class="stack">
+            <div>
+              <div class="inline"><span class="muted">Star Client</span><b class="right">118 MB</b></div>
+              <div class="progress"><div class="progress__bar progress__bar--grad" style="width:34%"></div></div>
+            </div>
+            <div>
+              <div class="inline"><span class="muted">Typical launcher</span><b class="right">326 MB</b></div>
+              <div class="progress"><div class="progress__bar" style="width:92%;background:var(--sc-bg-skeleton)"></div></div>
+            </div>
+            <p class="muted" style="font-size:var(--sc-font-size-sm);margin:0">
+              Lazy icon decoding, shared pixmap cache and no embedded browser keep the idle footprint flat.
+            </p>
+          </div>
+        </div>
+
+        <div class="card card--pad-sm">
+          <div class="card__head">
+            <div><h3 class="card__title">Star Menu</h3><p class="card__desc">Preset mods for this instance</p></div>
+            <span class="badge badge--accent">6 on</span>
+          </div>
+          <div class="stack">
+            <div class="inline"><svg width="15" height="15" style="color:var(--sc-accent)"><use href="#i-check-circle"/></svg><span>Sodium-class renderer</span></div>
+            <div class="inline"><svg width="15" height="15" style="color:var(--sc-accent)"><use href="#i-check-circle"/></svg><span>Zoom &amp; waypoints</span></div>
+            <div class="inline"><svg width="15" height="15" style="color:var(--sc-accent)"><use href="#i-check-circle"/></svg><span>Performance HUD</span></div>
+            <p class="muted" style="font-size:var(--sc-font-size-sm);margin:0">
+              Toggle the whole set per instance, so mod conflicts never break your world.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section__head">
+          <h2 class="section__title">Your instances</h2>
+          <button class="btn btn--ghost btn--sm" data-goto="instances">View all <svg><use href="#i-chevron-r"/></svg></button>
+        </div>
+        <div class="instance-grid" id="homeInstances"></div>
+      </div>
+    </section>
+
+    <!-- -------------------------------------------------------- Instances -->
+    <section class="page" id="page-instances">
+      <div class="page__head">
+        <div>
+          <h1 class="page__title">Instances</h1>
+          <p class="page__sub">4 instances · 12.4 GB on disk</p>
+        </div>
+        <div class="page__actions">
+          <button class="chip is-on">All</button>
+          <button class="chip">Fabric</button>
+          <button class="chip">Forge</button>
+          <button class="chip">Vanilla</button>
+          <button class="btn btn--primary"><svg><use href="#i-plus"/></svg>New instance</button>
+        </div>
+      </div>
+      <div class="instance-grid" id="allInstances"></div>
+    </section>
+
+    <!-- ------------------------------------------------- Instance detail -->
+    <section class="page" id="page-instance">
+      <div class="page__head" style="margin-bottom:var(--sc-space-5)">
+        <div class="inline">
+          <button class="btn btn--ghost btn--icon" data-goto="instances" aria-label="Back to instances"><svg><use href="#i-chevron-l"/></svg></button>
+          <div>
+            <nav class="crumbs" aria-label="Breadcrumb">
+              <button class="crumb" data-goto="instances">Instances</button>
+              <svg class="crumb__sep"><use href="#i-chevron-r"/></svg>
+              <span class="crumb crumb--current" id="instTitle">Star Client</span>
+            </nav>
+            <p class="page__sub" id="instSub" style="margin-top:5px">Minecraft 1.21.1 · Fabric 0.16.9</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="launch-strip">
+        <div class="launch-strip__id">
+          <svg class="launch-strip__icon" viewBox="0 0 64 64"><use href="#art-tech"/></svg>
+          <div>
+            <h2 class="launch-strip__name" id="instName">Star Client</h2>
+            <div class="launch-strip__badges">
+              <span class="badge badge--accent">Fabric</span>
+              <span class="badge">1.21.1</span>
+              <span class="badge badge--success">Java 21</span>
+              <span class="badge" id="instModCount">87 mods</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="mini-stat">
+          <span>Heap</span>
+          <b id="miniRam">6144 MB</b>
+        </div>
+        <div class="mini-stat">
+          <span>Collector</span>
+          <b id="miniGc">G1GC</b>
+        </div>
+
+        <div class="launch-strip__actions">
+          <button class="btn btn--icon" data-toast="Opening instance folder" aria-label="Open folder"><svg><use href="#i-folder"/></svg></button>
+          <button class="btn btn--icon" data-toast="Instance settings" aria-label="Instance settings"><svg><use href="#i-cog"/></svg></button>
+          <button class="btn btn--launch" id="instLaunch"><svg><use href="#i-play"/></svg><span>Play</span></button>
+        </div>
+      </div>
+
+      <div class="tabs" role="tablist">
+        <button class="tab is-on" data-tab="overview">Overview</button>
+        <button class="tab" data-tab="starmenu">Star Menu <span class="tab__count">6</span></button>
+        <button class="tab" data-tab="mods">Mods <span class="tab__count">87</span></button>
+        <button class="tab" data-tab="worlds">Worlds <span class="tab__count">4</span></button>
+        <button class="tab" data-tab="logs">Logs</button>
+        <button class="tab" data-tab="settings">Settings</button>
+      </div>
+
+      <!-- overview -->
+      <div class="tabpanel is-active" data-panel="overview">
+        <div class="grid grid--2">
+          <div class="card">
+            <div class="card__head"><div><h3 class="card__title">Instance summary</h3><p class="card__desc">Last played 2 hours ago · 41.2 hours total</p></div></div>
+            <table class="table">
+              <tbody>
+                <tr><td class="muted">Loader</td><td>Fabric 0.16.9</td></tr>
+                <tr><td class="muted">Minecraft</td><td>1.21.1</td></tr>
+                <tr><td class="muted">Java</td><td>Eclipse Temurin 21.0.4 <span class="muted">(managed)</span></td></tr>
+                <tr><td class="muted">Memory</td><td><span id="sumRam">6144 MB</span> <span class="muted">· recommended 6144 MB</span></td></tr>
+                <tr><td class="muted">Garbage collector</td><td><span id="sumGc">G1GC</span></td></tr>
+                <tr><td class="muted">Star Menu</td><td><span class="badge badge--accent">Enabled</span> <span class="muted">· 6 presets</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="card">
+            <div class="card__head"><div><h3 class="card__title">Tune before launch</h3><p class="card__desc">Changes apply to this instance only</p></div></div>
+
+            <div class="field">
+              <label class="field__label" for="quickRam">Memory allocation</label>
+              <div class="ram">
+                <div class="ram__top">
+                  <div class="ram__value"><span id="quickRamValue">6144</span><small>MB</small></div>
+                  <div class="inline">
+                    <input class="input input--num input--sm" type="number" id="quickRamNumber" value="6144" min="512" max="32768" step="256" aria-label="Memory in MB">
+                    <span class="muted">MB</span>
+                  </div>
+                </div>
+                <div class="ram__track">
+                  <input type="range" class="range" id="quickRam" min="512" max="32768" step="256" value="6144">
+                </div>
+                <div class="ram__scale"><span>512 MB</span><span>16 GB</span><span>32 GB</span></div>
+                <div class="ram__quick">
+                  <button class="chip" data-ram="2048">2 GB</button>
+                  <button class="chip" data-ram="4096">4 GB</button>
+                  <button class="chip is-on" data-ram="6144">6 GB</button>
+                  <button class="chip" data-ram="8192">8 GB</button>
+                  <button class="chip" data-ram="16384">16 GB</button>
+                  <button class="chip" id="ramAuto"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><use href="#i-refresh"/></svg>Auto</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="field" style="margin-bottom:0">
+              <label class="field__label" for="quickGc">Garbage collector</label>
+              <select class="select" id="quickGc">
+                <option value="g1gc" selected>G1GC — balanced default</option>
+                <option value="zgc">ZGC — ultra-low pause (Java 17+)</option>
+                <option value="zgc-gen">Generational ZGC — Java 21+</option>
+                <option value="shenandoah">Shenandoah — low pause</option>
+                <option value="serial">Serial GC — smallest footprint</option>
+                <option value="parallel">Parallel GC — max throughput</option>
+              </select>
+              <span class="field__hint" id="quickGcHint">Best all-round choice for 4-8 GB heaps.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- star menu -->
+      <div class="tabpanel" data-panel="starmenu">
+        <div class="starmenu-banner">
+          <div class="starmenu-banner__icon"><svg viewBox="0 0 256 256" fill="currentColor" style="color:var(--sc-star)"><use href="#i-star"/></svg></div>
+          <div class="starmenu-banner__body">
+            <div class="starmenu-banner__title">Star Menu</div>
+            <div class="starmenu-banner__desc">
+              A curated set of quality-of-life mods that Star Client installs and manages for you.
+              Turn the whole set off for instances where a modpack already does the job — nothing is
+              deleted, it simply stops loading.
+            </div>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="starMenuMaster" checked>
+            <span class="switch__track"></span>
+          </label>
+        </div>
+
+        <div class="card card--flush">
+          <div class="mod-row">
+            <div class="mod-row__icon"><svg><use href="#i-spark"/></svg></div>
+            <div class="mod-row__body">
+              <div class="mod-row__name">Performance renderer <span class="badge badge--success">Recommended</span></div>
+              <div class="mod-row__desc">Modern rendering pipeline. Large FPS gains on integrated graphics.</div>
+            </div>
+            <div class="mod-row__meta">
+              <span class="muted mono">1.21.1</span>
+              <label class="switch"><input type="checkbox" class="smMod" checked><span class="switch__track"></span></label>
+            </div>
+          </div>
+
+          <div class="mod-row">
+            <div class="mod-row__icon"><svg><use href="#i-users"/></svg></div>
+            <div class="mod-row__body">
+              <div class="mod-row__name">Player list extras</div>
+              <div class="mod-row__desc">Ping, heads and reachable distance in the tab list.</div>
+            </div>
+            <div class="mod-row__meta">
+              <span class="muted mono">1.21.1</span>
+              <label class="switch"><input type="checkbox" class="smMod" checked><span class="switch__track"></span></label>
+            </div>
+          </div>
+
+          <div class="mod-row">
+            <div class="mod-row__icon"><svg><use href="#i-compass"/></svg></div>
+            <div class="mod-row__body">
+              <div class="mod-row__name">Zoom &amp; waypoints</div>
+              <div class="mod-row__desc">Scroll-to-zoom and minimap markers that persist per world.</div>
+            </div>
+            <div class="mod-row__meta">
+              <span class="muted mono">1.21.1</span>
+              <label class="switch"><input type="checkbox" class="smMod" checked><span class="switch__track"></span></label>
+            </div>
+          </div>
+
+          <div class="mod-row">
+            <div class="mod-row__icon"><svg><use href="#i-cpu"/></svg></div>
+            <div class="mod-row__body">
+              <div class="mod-row__name">Performance HUD</div>
+              <div class="mod-row__desc">FPS, frame time and memory graph in the corner.</div>
+            </div>
+            <div class="mod-row__meta">
+              <span class="muted mono">1.21.1</span>
+              <label class="switch"><input type="checkbox" class="smMod" checked><span class="switch__track"></span></label>
+            </div>
+          </div>
+
+          <div class="mod-row">
+            <div class="mod-row__icon"><svg><use href="#i-shield"/></svg></div>
+            <div class="mod-row__body">
+              <div class="mod-row__name">Connection watchdog</div>
+              <div class="mod-row__desc">Recovers stalled server connections instead of kicking you to the menu.</div>
+              <div class="conflict">
+                <svg><use href="#i-alert"/></svg>
+                <span>Conflicts with the server-side anti-cheat in <b>Skyblock Islands</b>. Leave this one off there.</span>
+              </div>
+            </div>
+            <div class="mod-row__meta">
+              <span class="muted mono">1.21.1</span>
+              <label class="switch"><input type="checkbox" class="smMod" checked><span class="switch__track"></span></label>
+            </div>
+          </div>
+
+          <div class="mod-row">
+            <div class="mod-row__icon"><svg><use href="#i-wrench"/></svg></div>
+            <div class="mod-row__body">
+              <div class="mod-row__name">Screenshot tools</div>
+              <div class="mod-row__desc">Copy-to-clipboard, auto-naming and instant gallery.</div>
+            </div>
+            <div class="mod-row__meta">
+              <span class="muted mono">1.21.1</span>
+              <label class="switch"><input type="checkbox" class="smMod" checked><span class="switch__track"></span></label>
+            </div>
+          </div>
+        </div>
+
+        <div class="banner banner--warning" style="margin-top:var(--sc-space-6)">
+          <svg><use href="#i-alert"/></svg>
+          <div class="banner__body">
+            <b>Mod conflicts are checked for you</b>
+            Star Client disables a preset automatically when it finds a duplicate mod in the instance,
+            and tells you exactly which file caused it.
+          </div>
+        </div>
+      </div>
+
+      <!-- mods -->
+      <div class="tabpanel" data-panel="mods">
+        <div class="inline" style="margin-bottom:var(--sc-space-5)">
+          <label class="titlebar__search" style="max-width:320px">
+            <svg><use href="#i-search"/></svg>
+            <input type="search" placeholder="Filter 87 mods…">
+          </label>
+          <button class="btn btn--primary right"><svg><use href="#i-plus"/></svg>Add mod</button>
+        </div>
+        <div class="card card--flush">
+          <table class="table">
+            <thead><tr><th>Mod</th><th>Version</th><th>Source</th><th>Star Menu</th><th></th></tr></thead>
+            <tbody id="modTable"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- worlds -->
+      <div class="tabpanel" data-panel="worlds">
+        <div class="grid grid--auto">
+          <div class="card is-interactive">
+            <div class="inline" style="justify-content:space-between"><h3 class="card__title">Star Client SMP</h3><span class="badge badge--accent">Multiplayer</span></div>
+            <p class="card__desc" style="margin:var(--sc-space-3) 0">Survival · 1.21.1 · last played 2h ago</p>
+            <div class="inline"><span class="muted mono">412 MB</span><span class="right muted mono">14d played</span></div>
+          </div>
+          <div class="card is-interactive">
+            <div class="inline" style="justify-content:space-between"><h3 class="card__title">Skyblock Islands</h3><span class="badge">Singleplayer</span></div>
+            <p class="card__desc" style="margin:var(--sc-space-3) 0">Skyblock · 1.21.1 · last played yesterday</p>
+            <div class="inline"><span class="muted mono">88 MB</span><span class="right muted mono">3h played</span></div>
+          </div>
+          <div class="card is-interactive">
+            <div class="inline" style="justify-content:space-between"><h3 class="card__title">Creative Flat</h3><span class="badge">Singleplayer</span></div>
+            <p class="card__desc" style="margin:var(--sc-space-3) 0">Creative · 1.21.1 · last played 3d ago</p>
+            <div class="inline"><span class="muted mono">21 MB</span><span class="right muted mono">40m played</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- logs -->
+      <div class="tabpanel" data-panel="logs">
+        <div class="inline" style="margin-bottom:var(--sc-space-4)">
+          <button class="btn btn--sm"><svg><use href="#i-refresh"/></svg>Refresh</button>
+          <button class="btn btn--sm"><svg><use href="#i-download"/></svg>Export</button>
+          <span class="badge badge--success right">Game running</span>
+        </div>
+        <div class="log" id="logView"></div>
+      </div>
+
+      <!-- instance settings -->
+      <div class="tabpanel" data-panel="settings">
+        <div class="grid grid--2">
+          <div class="card">
+            <div class="card__head"><h3 class="card__title">Java &amp; performance</h3></div>
+            <div class="row">
+              <div class="row__label"><span class="row__name">Java runtime</span><span class="row__desc">Temurin 21.0.4+7 LTS, managed by Star Client</span></div>
+              <div class="row__control"><button class="btn btn--sm">Change</button></div>
+            </div>
+            <div class="row">
+              <div class="row__label"><span class="row__name">Custom JVM arguments</span><span class="row__desc">Overrides the collector preset for this instance</span></div>
+              <div class="row__control"><label class="switch"><input type="checkbox"><span class="switch__track"></span></label></div>
+            </div>
+            <div class="row">
+              <div class="row__label"><span class="row__name">Reduce launcher footprint</span><span class="row__desc">Free instance art and caches while Minecraft is running</span></div>
+              <div class="row__control"><label class="switch"><input type="checkbox" checked><span class="switch__track"></span></label></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card__head"><h3 class="card__title">Star Menu</h3></div>
+            <div class="row">
+              <div class="row__label"><span class="row__name">Enable preset mods</span><span class="row__desc">Turn everything off for heavily modded packs</span></div>
+              <div class="row__control"><label class="switch"><input type="checkbox" checked><span class="switch__track"></span></label></div>
+            </div>
+            <div class="row">
+              <div class="row__label"><span class="row__name">Auto-disable on conflict</span><span class="row__desc">Skip a preset rather than refusing to launch</span></div>
+              <div class="row__control"><label class="switch"><input type="checkbox" checked><span class="switch__track"></span></label></div>
+            </div>
+            <div class="row">
+              <div class="row__label"><span class="row__name">Install presets per instance</span><span class="row__desc">Keeps each instance isolated instead of sharing a global folder</span></div>
+              <div class="row__control"><label class="switch"><input type="checkbox" checked><span class="switch__track"></span></label></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ----------------------------------------------------------- Browse -->
+    <section class="page" id="page-browse">
+      <div class="page__head">
+        <div>
+          <h1 class="page__title">Browse content</h1>
+          <p class="page__sub">Mods, modpacks, resource packs and shaders</p>
+        </div>
+        <div class="page__actions">
+          <select class="select"><option>Minecraft 1.21.1</option><option>Minecraft 1.20.1</option></select>
+          <select class="select"><option>Fabric</option><option>Forge</option><option>NeoForge</option><option>Any loader</option></select>
+        </div>
+      </div>
+      <div class="grid grid--auto" id="browseGrid"></div>
+    </section>
+
+    <!-- --------------------------------------------------------- Accounts -->
+    <section class="page" id="page-accounts">
+      <div class="page__head">
+        <div>
+          <h1 class="page__title">Accounts</h1>
+          <p class="page__sub">Official Microsoft accounts and offline profiles side by side</p>
+        </div>
+        <div class="page__actions">
+          <button class="btn btn--primary" data-toast="Opening Microsoft device-code sign-in"><svg><use href="#i-key"/></svg>Add Microsoft account</button>
+          <button class="btn" data-toast="Offline profile created"><svg><use href="#i-plus"/></svg>Add offline profile</button>
+        </div>
+      </div>
+
+      <div class="banner">
+        <svg><use href="#i-shield"/></svg>
+        <div class="banner__body">
+          <b>Your credentials never touch Star Client</b>
+          Microsoft sign-in uses the official device-code flow and tokens are stored in your OS keychain,
+          encrypted per user. Offline profiles are local-only and work without a network.
+        </div>
+      </div>
+
+      <div class="stack">
+        <div class="account-card is-active">
+          <div class="account-card__avatar"></div>
+          <div class="account-card__body">
+            <div class="account-card__name">StarKnight</div>
+            <div class="account-card__sub">Microsoft · UUID 069a79f4-44e9-4726-a5be-fca90e38aaf5</div>
+          </div>
+          <span class="badge badge--success">Active</span>
+          <button class="btn btn--sm">Manage</button>
+        </div>
+        <div class="account-card">
+          <div class="account-card__avatar" style="background:linear-gradient(140deg,#FFB63D,#FF6B4A)"></div>
+          <div class="account-card__body">
+            <div class="account-card__name">LocalTest</div>
+            <div class="account-card__sub">Offline profile · no authentication required</div>
+          </div>
+          <span class="badge">Offline</span>
+          <button class="btn btn--sm">Use</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- --------------------------------------------------------- Settings -->
+    <section class="page" id="page-settings">
+      <div class="page__head">
+        <div>
+          <h1 class="page__title">Settings</h1>
+          <p class="page__sub">Appearance, memory, Java runtimes and Star Menu presets</p>
+        </div>
+        <div class="page__actions">
+          <button class="btn btn--ghost btn--sm" data-toast="Settings exported">Export</button>
+          <button class="btn btn--ghost btn--sm" data-toast="Settings imported">Import</button>
+        </div>
+      </div>
+
+      <div class="settings">
+        <nav class="settings__nav" aria-label="Settings sections">
+          <button class="settings__link is-on" data-panel="appearance"><svg><use href="#i-palette"/></svg>Appearance</button>
+          <button class="settings__link" data-panel="memory"><svg><use href="#i-memory"/></svg>Memory</button>
+          <button class="settings__link" data-panel="java"><svg><use href="#i-cpu"/></svg>Java &amp; performance</button>
+          <button class="settings__link" data-panel="starmenu"><svg viewBox="0 0 256 256" fill="currentColor" width="16" height="16"><use href="#i-star"/></svg>Star Menu</button>
+          <button class="settings__link" data-panel="instances"><svg><use href="#i-layers"/></svg>Instances</button>
+          <button class="settings__link" data-panel="downloads"><svg><use href="#i-download"/></svg>Downloads</button>
+          <button class="settings__link" data-panel="launcher"><svg><use href="#i-cog"/></svg>Launcher</button>
+          <button class="settings__link" data-panel="about"><svg><use href="#i-info"/></svg>About</button>
+        </nav>
+
+        <div>
+          <!-- appearance -->
+          <div class="settings__panel is-active" data-panel="appearance">
+            <div class="settings__group">
+              <h3 class="settings__group-title">Theme</h3>
+              <div class="theme-picker">
+                <button class="theme-option is-on" data-theme-value="oled">
+                  <div class="theme-option__preview" style="--pc-border:#17171F">
+                    <div class="theme-option__side" style="background:#040406"></div>
+                    <div class="theme-option__main" style="background:#000">
+                      <div class="theme-option__bar" style="background:#20202A"></div>
+                      <div class="theme-option__bar theme-option__bar--short" style="background:#17171F"></div>
+                      <div class="theme-option__bar theme-option__bar--btn" style="background:#7C6BFF"></div>
+                    </div>
+                  </div>
+                  <div class="theme-option__label">OLED Black <span class="theme-option__tag">True black</span></div>
+                </button>
+
+                <button class="theme-option" data-theme-value="dark">
+                  <div class="theme-option__preview" style="--pc-border:#282833">
+                    <div class="theme-option__side" style="background:#0A0A0F"></div>
+                    <div class="theme-option__main" style="background:#0C0C11">
+                      <div class="theme-option__bar" style="background:#282833"></div>
+                      <div class="theme-option__bar theme-option__bar--short" style="background:#1E1E27"></div>
+                      <div class="theme-option__bar theme-option__bar--btn" style="background:#7C6BFF"></div>
+                    </div>
+                  </div>
+                  <div class="theme-option__label">Midnight <span class="theme-option__tag">Soft dark</span></div>
+                </button>
+
+                <button class="theme-option" data-theme-value="light">
+                  <div class="theme-option__preview" style="--pc-border:#D8DCE9">
+                    <div class="theme-option__side" style="background:#FFFFFF;border-right:1px solid #E6E9F2"></div>
+                    <div class="theme-option__main" style="background:#F2F4FA">
+                      <div class="theme-option__bar" style="background:#D8DCE9"></div>
+                      <div class="theme-option__bar theme-option__bar--short" style="background:#E6E9F2"></div>
+                      <div class="theme-option__bar theme-option__bar--btn" style="background:#6450F0"></div>
+                    </div>
+                  </div>
+                  <div class="theme-option__label">Daylight <span class="theme-option__tag">Light</span></div>
+                </button>
+
+                <button class="theme-option" data-theme-value="system">
+                  <div class="theme-option__preview" style="--pc-border:#D8DCE9">
+                    <div class="theme-option__side" style="background:linear-gradient(180deg,#0A0A0F 50%,#FFFFFF 50%)"></div>
+                    <div class="theme-option__main" style="background:linear-gradient(180deg,#0C0C11 50%,#F2F4FA 50%)">
+                      <div class="theme-option__bar" style="background:linear-gradient(90deg,#282833 50%,#D8DCE9 50%)"></div>
+                      <div class="theme-option__bar theme-option__bar--short" style="background:linear-gradient(90deg,#1E1E27 50%,#E6E9F2 50%)"></div>
+                      <div class="theme-option__bar theme-option__bar--btn" style="background:#7C6BFF"></div>
+                    </div>
+                  </div>
+                  <div class="theme-option__label">Match system <span class="theme-option__tag">Auto</span></div>
+                </button>
+              </div>
+            </div>
+
+            <div class="settings__group">
+              <h3 class="settings__group-title">Accent</h3>
+              <div class="accent-picker" id="accentPicker"></div>
+            </div>
+
+            <div class="settings__group">
+              <h3 class="settings__group-title">Preview</h3>
+              <div class="preview-strip">
+                <div class="preview-strip__bar">
+                  <svg width="16" height="16" viewBox="0 0 256 256" fill="currentColor" style="color:var(--sc-star)"><use href="#i-star"/></svg>
+                  <span style="font-weight:600;font-size:var(--sc-font-size-sm)">Star Client</span>
+                  <span class="badge badge--accent right">Fabric 1.21.1</span>
+                </div>
+                <div class="preview-strip__body">
+                  <button class="btn btn--primary btn--sm">Primary</button>
+                  <button class="btn btn--sm">Secondary</button>
+                  <button class="btn btn--outline btn--sm">Outline</button>
+                  <button class="btn btn--danger btn--sm">Danger</button>
+                  <span class="badge badge--success">Success</span>
+                  <span class="badge badge--warning">Warning</span>
+                  <span class="badge badge--danger">Error</span>
+                  <span class="switch"><input type="checkbox" checked><span class="switch__track"></span></span>
+                </div>
+              </div>
+            </div>
+
+            <div class="settings__group">
+              <h3 class="settings__group-title">Interface</h3>
+              <div class="card" style="padding:var(--sc-space-5) var(--sc-space-6)">
+                <div class="row">
+                  <div class="row__label"><span class="row__name">Reduce transparency &amp; blur</span><span class="row__desc">Fewer compositing layers, lower GPU and memory cost</span></div>
+                  <div class="row__control"><label class="switch"><input type="checkbox"><span class="switch__track"></span></label></div>
+                </div>
+                <div class="row">
+                  <div class="row__label"><span class="row__name">Reduce motion</span><span class="row__desc">Disable page and card animations</span></div>
+                  <div class="row__control"><label class="switch"><input type="checkbox"><span class="switch__track"></span></label></div>
+                </div>
+                <div class="row">
+                  <div class="row__label"><span class="row__name">Animate the hero star</span><span class="row__desc">Slow breathing glow on the Star Start page</span></div>
+                  <div class="row__control"><label class="switch"><input type="checkbox" checked><span class="switch__track"></span></label></div>
+                </div>
+                <div class="row">
+                  <div class="row__label"><span class="row__name">Compact density</span><span class="row__desc">Tighter rows, more instances on screen</span></div>
+                  <div class="row__control"><label class="switch"><input type="checkbox" id="compactToggle"><span class="switch__track"></span></label></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- memory -->
+          <div class="settings__panel" data-panel="memory">
+            <div class="goal-callout">
+              <svg><use href="#i-info"/></svg>
+              <div class="goal-callout__body">
+                <b>How much memory do you actually need?</b>
+                More is not better. Minecraft's collector works hardest when the heap is 4–8 GB.
+                Beyond that you pay for it in longer pauses and a slower launcher. Star Client tells you
+                when a value is inside the safe band for your machine.
+              </div>
+            </div>
+
+            <div class="settings__group">
+              <h3 class="settings__group-title">Default allocation</h3>
+              <div class="card" style="padding:var(--sc-space-6)">
+                <div class="ram">
+                  <div class="ram__top">
+                    <div class="ram__value"><span id="ramValue">6144</span><small>MB</small></div>
+                    <div class="inline">
+                      <input class="input input--num" type="number" id="ramNumber" value="6144" min="512" max="32768" step="256">
+                      <span class="muted">MB</span>
+                    </div>
+                  </div>
+                  <div class="ram__track">
+                    <div class="ram__zones">
+                      <div class="ram__zone ram__zone--bad"  style="left:0%;    width:4.7%"></div>
+                      <div class="ram__zone ram__zone--good" style="left:4.7%; width:21.5%"></div>
+                      <div class="ram__zone ram__zone--warn" style="left:26.2%;width:48.9%"></div>
+                      <div class="ram__zone ram__zone--bad"  style="left:75.1%;width:24.9%"></div>
+                    </div>
+                    <input type="range" class="range" id="ram" min="512" max="32768" step="256" value="6144" aria-label="Default memory in MB">
+                  </div>
+                  <div class="ram__scale"><span>512 MB</span><span>8 GB</span><span>16 GB</span><span>32 GB</span></div>
+                  <div class="ram__quick">
+                    <button class="chip" data-ram="2048">2 GB</button>
+                    <button class="chip" data-ram="4096">4 GB</button>
+                    <button class="chip is-on" data-ram="6144">6 GB</button>
+                    <button class="chip" data-ram="8192">8 GB</button>
+                    <button class="chip" data-ram="12288">12 GB</button>
+                    <button class="chip" data-ram="16384">16 GB</button>
+                    <button class="chip" id="ramAuto2"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><use href="#i-refresh"/></svg>Auto</button>
+                  </div>
+                </div>
+
+                <div id="ramNotice" class="banner banner--success" style="margin:var(--sc-space-6) 0 0">
+                  <svg><use href="#i-check-circle"/></svg>
+                  <div class="banner__body" id="ramNoticeBody">
+                    <b>Comfortable</b>
+                    6144 MB is inside the recommended band for a 16 GB machine with 87 mods.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="settings__group">
+              <h3 class="settings__group-title">Automatic behaviour</h3>
+              <div class="card" style="padding:var(--sc-space-5) var(--sc-space-6)">
+                <div class="row">
+                  <div class="row__label"><span class="row__name">Auto-size per instance</span><span class="row__desc">Estimate from mod count and render distance, clamped to your safe maximum</span></div>
+                  <div class="row__control"><label class="switch"><input type="checkbox" checked><span class="switch__track"></span></label></div>
+                </div>
+                <div class="row">
+                  <div class="row__label"><span class="row__name">Leave headroom for the system</span><span class="row__desc">Never allocate more than 75% of physical memory</span></div>
+                  <div class="row__control">
+                    <input class="input input--num input--sm" type="number" value="75" min="30" max="90" step="5">
+                    <span class="muted">%</span>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="row__label"><span class="row__name">Warn above 12 GB</span><span class="row__desc">Very large heaps often measure slower than a tuned 8 GB one</span></div>
+                  <div class="row__control"><label class="switch"><input type="checkbox" checked><span class="switch__track"></span></label></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="settings__group">
+              <h3 class="settings__group-title">Launcher footprint</h3>
+              <div class="card" style="padding:var(--sc-space-5) var(--sc-space-6)">
+                <div class="row">
+                  <div class="row__label"><span class="row__name">Lazy icon loading</span><span class="row__desc">Decode instance and mod art only when it scrolls into view</span></div>
+                  <div class="row__control"><label class="switch"><input type="checkbox" checked><span class="switch__track"></span></label></div>
+                </div>
+                <div class="row">
+                  <div class="row__label"><span class="row__name">Free caches while playing</span><span class="row__desc">Release cached art and metadata when Minecraft starts</span></div>
+                  <div class="row__control"><label class="switch"><input type="checkbox" checked><span class="switch__track"></span></label></div>
+                </div>
+                <div class="row">
+                  <div class="row__label"><span class="row__name">Cap thumbnail cache</span><span class="row__desc">Streams instance art from disk instead of holding it in memory</span></div>
+                  <div class="row__control">
+                    <select class="select input--sm"><option>64 MB</option><option selected>128 MB</option><option>256 MB</option><option>Unlimited</option></select>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="row__label"><span class="row__name">Suspend background tasks</span><span class="row__desc">Pause update checks and index rebuilds during gameplay</span></div>
+                  <div class="row__control"><label class="switch"><input type="checkbox" checked><span class="switch__track"></span></label></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- java & performance -->
+          <div class="settings__panel" data-panel="java">
+            <div class="settings__group">
+              <h3 class="settings__group-title">Garbage collector</h3>
+              <div class="radio-cards" id="gcCards"></div>
+
+              <div class="args-panel">
+                <div class="args-panel__head">
+                  <span class="args-panel__title">Resolved arguments</span>
+                  <div class="inline">
+                    <span class="badge badge--accent" id="gcJavaBadge">Java 8+</span>
+                    <button class="btn btn--sm" id="copyArgs2" data-toast="Copied resolved arguments">
+                      <svg><use href="#i-download"/></svg>Copy
+                    </button>
+                    <button class="btn btn--ghost btn--sm" id="gcReset">
+                      <svg><use href="#i-refresh"/></svg>Reset to default
+                    </button>
+                  </div>
+                </div>
+                <pre class="args-panel__code" id="gcArgsPreview"></pre>
+              </div>
+
+              <p class="muted" style="font-size:var(--sc-font-size-sm);margin-top:var(--sc-space-4)">
+                Star Client applies the flags of the selected collector and strips any conflicting ones
+                from custom arguments, so you can switch without editing a JVM string.
+                <b>Reset to default</b> restores G1GC with the tuned Star Client flag set.
+              </p>
+            </div>
+
+            <div class="settings__group">
+              <h3 class="settings__group-title">Java runtimes</h3>
+              <div class="card card--flush">
+                <table class="table">
+                  <thead><tr><th>Runtime</th><th>Version</th><th>Detected</th><th></th></tr></thead>
+                  <tbody>
+                    <tr><td>Eclipse Temurin</td><td>21.0.4+7 LTS</td><td><span class="badge badge--success">Recommended</span></td><td class="right"><button class="btn btn--ghost btn--sm">Use</button></td></tr>
+                    <tr><td>Eclipse Temurin</td><td>17.0.12+7 LTS</td><td><span class="badge">Installed</span></td><td class="right"><button class="btn btn--ghost btn--sm">Use</button></td></tr>
+                    <tr><td>Microsoft Build</td><td>8u422-b05</td><td><span class="badge badge--warning">Legacy</span></td><td class="right"><button class="btn btn--ghost btn--sm">Use</button></td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="inline" style="margin-top:var(--sc-space-4)">
+                <button class="btn btn--primary btn--sm" data-toast="Scanning for installed Java runtimes">Scan for runtimes</button>
+                <button class="btn btn--sm" data-toast="Downloading Temurin 21">Download Java 21</button>
+              </div>
+            </div>
+
+            <div class="settings__group">
+              <h3 class="settings__group-title">Advanced JVM arguments</h3>
+              <div class="card">
+                <div class="field" style="margin-bottom:var(--sc-space-4)">
+                  <label class="field__label" for="jvmArgs">Applies after the collector preset</label>
+                  <textarea class="input mono" id="jvmArgs" rows="3" style="height:auto;padding:var(--sc-space-4);resize:vertical">-XX:+AlwaysPreTouch -XX:+UseStringDeduplication</textarea>
+                  <span class="field__hint">Duplicated collector flags are removed automatically on launch.</span>
+                </div>
+                <div class="inline">
+                  <button class="btn btn--sm" id="copyArgs" data-toast="Copied resolved arguments">Copy resolved arguments</button>
+                  <button class="btn btn--ghost btn--sm" data-toast="Arguments reset to defaults">Reset</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="settings__group">
+              <h3 class="settings__group-title">Performance</h3>
+              <div class="card" style="padding:var(--sc-space-5) var(--sc-space-6)">
+                <div class="row">
+                  <div class="row__label"><span class="row__name">Always pre-touch the heap</span><span class="row__desc">Slower first launch, smoother first minutes in-game</span></div>
+                  <div class="row__control"><label class="switch"><input type="checkbox" checked><span class="switch__track"></span></label></div>
+                </div>
+                <div class="row">
+                  <div class="row__label"><span class="row__name">Disable explicit GC calls</span><span class="row__desc">Stops mods from forcing full collections mid-fight</span></div>
+                  <div class="row__control"><label class="switch"><input type="checkbox" checked><span class="switch__track"></span></label></div>
+                </div>
+                <div class="row">
+                  <div class="row__label"><span class="row__name">Prioritise the game process</span><span class="row__desc">Raise Minecraft's priority above the launcher</span></div>
+                  <div class="row__control"><label class="switch"><input type="checkbox" checked><span class="switch__track"></span></label></div>
+                </div>
+                <div class="row">
+                  <div class="row__label"><span class="row__name">Close launcher on launch</span><span class="row__desc">Frees roughly 100 MB the moment the game starts</span></div>
+                  <div class="row__control"><label class="switch"><input type="checkbox"><span class="switch__track"></span></label></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- star menu -->
+          <div class="settings__panel" data-panel="starmenu">
+            <div class="starmenu-banner">
+              <div class="starmenu-banner__icon"><svg viewBox="0 0 256 256" fill="currentColor" style="color:var(--sc-star)"><use href="#i-star"/></svg></div>
+              <div class="starmenu-banner__body">
+                <div class="starmenu-banner__title">Star Menu presets</div>
+                <div class="starmenu-banner__desc">
+                  Choose which preset mods Star Client may inject into new instances. Existing instances
+                  keep their own selection and can be turned off individually.
+                </div>
+              </div>
+              <label class="switch"><input type="checkbox" checked><span class="switch__track"></span></label>
+            </div>
+
+            <div class="card" style="padding:var(--sc-space-5) var(--sc-space-6)">
+              <div class="row">
+                <div class="row__label"><span class="row__name">Install presets into new instances</span><span class="row__desc">Running instances are never modified on disk</span></div>
+                <div class="row__control"><label class="switch"><input type="checkbox" checked><span class="switch__track"></span></label></div>
+              </div>
+              <div class="row">
+                <div class="row__label"><span class="row__name">Check for conflicts before launch</span><span class="row__desc">Skipped presets are listed in the launch summary</span></div>
+                <div class="row__control"><label class="switch"><input type="checkbox" checked><span class="switch__track"></span></label></div>
+              </div>
+              <div class="row">
+                <div class="row__label"><span class="row__name">Global switch</span><span class="row__desc">Disable Star Menu everywhere with one toggle</span></div>
+                <div class="row__control"><label class="switch"><input type="checkbox" checked><span class="switch__track"></span></label></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- instances -->
+          <div class="settings__panel" data-panel="instances">
+            <div class="settings__group">
+              <h3 class="settings__group-title">Default behaviour</h3>
+              <div class="card" style="padding:var(--sc-space-5) var(--sc-space-6)">
+                <div class="row">
+                  <div class="row__label"><span class="row__name">Show instance grid</span><span class="row__desc">Cards with artwork instead of a compact list</span></div>
+                  <div class="row__control"><label class="switch"><input type="checkbox" checked><span class="switch__track"></span></label></div>
+                </div>
+                <div class="row">
+                  <div class="row__label"><span class="row__name">Show game time</span><span class="row__desc">Total hours per instance on the card</span></div>
+                  <div class="row__control"><label class="switch"><input type="checkbox" checked><span class="switch__track"></span></label></div>
+                </div>
+                <div class="row">
+                  <div class="row__label"><span class="row__name">Sort order</span><span class="row__desc">How instances are listed</span></div>
+                  <div class="row__control"><select class="select input--sm"><option selected>Last played</option><option>Name</option><option>Created</option><option>Total playtime</option></select></div>
+                </div>
+                <div class="row">
+                  <div class="row__label"><span class="row__name">Instances folder</span><span class="row__desc mono">~/.local/share/StarClient/instances</span></div>
+                  <div class="row__control"><button class="btn btn--sm" data-toast="Opening instances folder">Browse</button></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- downloads -->
+          <div class="settings__panel" data-panel="downloads">
+            <div class="settings__group">
+              <h3 class="settings__group-title">Network</h3>
+              <div class="card" style="padding:var(--sc-space-5) var(--sc-space-6)">
+                <div class="row">
+                  <div class="row__label"><span class="row__name">Parallel downloads</span><span class="row__desc">Higher uses more memory while fetching</span></div>
+                  <div class="row__control"><input class="input input--num input--sm" type="number" value="6" min="1" max="32"></div>
+                </div>
+                <div class="row">
+                  <div class="row__label"><span class="row__name">Concurrent mod installs</span><span class="row__desc">Keep this low when adding large modpacks</span></div>
+                  <div class="row__control"><input class="input input--num input--sm" type="number" value="4" min="1" max="16"></div>
+                </div>
+                <div class="row">
+                  <div class="row__label"><span class="row__name">Verify file hashes</span><span class="row__desc">Catches corrupted downloads before they crash a launch</span></div>
+                  <div class="row__control"><label class="switch"><input type="checkbox" checked><span class="switch__track"></span></label></div>
+                </div>
+                <div class="row">
+                  <div class="row__label"><span class="row__name">Content sources</span><span class="row__desc">Enable the catalogues you want to search</span></div>
+                  <div class="row__control"><label class="switch"><input type="checkbox" checked><span class="switch__track"></span></label></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- launcher -->
+          <div class="settings__panel" data-panel="launcher">
+            <div class="settings__group">
+              <h3 class="settings__group-title">Startup</h3>
+              <div class="card" style="padding:var(--sc-space-5) var(--sc-space-6)">
+                <div class="row">
+                  <div class="row__label"><span class="row__name">Open Star Start on launch</span><span class="row__desc">Show the quick-launch page instead of the instance list</span></div>
+                  <div class="row__control"><label class="switch"><input type="checkbox" checked><span class="switch__track"></span></label></div>
+                </div>
+                <div class="row">
+                  <div class="row__label"><span class="row__name">Check for updates</span><span class="row__desc">Notifies you when a new Star Client build is available</span></div>
+                  <div class="row__control"><label class="switch"><input type="checkbox" checked><span class="switch__track"></span></label></div>
+                </div>
+                <div class="row">
+                  <div class="row__label"><span class="row__name">Update channel</span><span class="row__desc">Stable gets tested builds only</span></div>
+                  <div class="row__control"><select class="select input--sm"><option selected>Stable</option><option>Beta</option><option>Nightly</option></select></div>
+                </div>
+                <div class="row">
+                  <div class="row__label"><span class="row__name">Language</span><span class="row__desc">Interface language</span></div>
+                  <div class="row__control"><select class="select input--sm"><option selected>English (US)</option><option>Deutsch</option><option>中文 (简体)</option><option>日本語</option></select></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="settings__group">
+              <h3 class="settings__group-title">Quick Start wizard</h3>
+              <div class="card" style="padding:var(--sc-space-5) var(--sc-space-6)">
+                <div class="row">
+                  <div class="row__label"><span class="row__name">Re-run the setup wizard</span><span class="row__desc">Pick a theme, memory and Java again from scratch</span></div>
+                  <div class="row__control"><button class="btn btn--sm" id="rerunWizard">Open wizard</button></div>
+                </div>
+                <div class="row">
+                  <div class="row__label"><span class="row__name">Show tips on Star Start</span><span class="row__desc">Contextual hints until you dismiss them</span></div>
+                  <div class="row__control"><label class="switch"><input type="checkbox" checked><span class="switch__track"></span></label></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- about (where the quiet credits live) -->
+          <div class="settings__panel" data-panel="about">
+            <div class="card" style="text-align:center;padding:var(--sc-space-9) var(--sc-space-6)">
+              <svg width="56" height="56" viewBox="0 0 256 256" fill="currentColor" style="color:var(--sc-star)"><use href="#i-star"/></svg>
+              <h2 style="margin:var(--sc-space-5) 0 var(--sc-space-2);font-size:var(--sc-font-size-2xl);letter-spacing:-0.5px">Star Client</h2>
+              <p class="muted" style="margin:0 0 var(--sc-space-6)">Version 21.1.0 · Universal build · Qt 6.7</p>
+              <div class="inline" style="justify-content:center">
+                <button class="btn btn--sm" data-toast="Star Client is up to date">Check for updates</button>
+                <button class="btn btn--ghost btn--sm" data-toast="Opening the project page">Project page</button>
+              </div>
+            </div>
+
+            <div class="card" style="margin-top:var(--sc-space-5);padding:var(--sc-space-5) var(--sc-space-6)">
+              <h3 class="settings__group-title" style="margin-bottom:var(--sc-space-3)">Licence</h3>
+              <p class="secondary" style="font-size:var(--sc-font-size-sm);margin:0 0 var(--sc-space-4)">
+                Star Client is free software released under the GNU General Public License v3.0.
+                You may redistribute and modify it under the same licence.
+              </p>
+              <button class="btn btn--sm" data-toast="Opening the full licence text">Read GPL-3.0</button>
+              <div class="softcredits">
+                Built on the work of the open-source launcher community. See the full attribution
+                list in <span class="mono">CREDITS.md</span> in the source distribution.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- ===================================================================== -->
+<!-- Quick Start wizard (first run)                                         -->
+<!-- ===================================================================== -->
+<div class="overlay" id="wizardOverlay" role="dialog" aria-modal="true" aria-labelledby="wizardTitle">
+  <div class="modal wizard">
+    <div class="wizard__steps">
+      <div class="wstep is-on" data-wstep="1"><span class="wstep__num">1</span>Welcome</div>
+      <div class="wstep" data-wstep="2"><span class="wstep__num">2</span>Appearance</div>
+      <div class="wstep" data-wstep="3"><span class="wstep__num">3</span>Account</div>
+      <div class="wstep" data-wstep="4"><span class="wstep__num">4</span>Memory</div>
+      <div class="wstep" data-wstep="5"><span class="wstep__num">5</span>Ready</div>
+    </div>
+
+    <div class="modal__body">
+      <!-- 1 -->
+      <div class="wpanel is-active" data-wpanel="1">
+        <div class="wizard__hero">
+          <svg class="star" viewBox="0 0 256 256" fill="currentColor"><use href="#i-star"/></svg>
+          <h1 id="wizardTitle">Welcome to Star Client</h1>
+          <p>Let's get you flying in about thirty seconds. Every choice here can be changed later in Settings.</p>
+          <div class="progress-dots"><i class="is-on"></i><i></i><i></i><i></i><i></i></div>
+        </div>
+
+        <div class="grid grid--3">
+          <div class="card card--pad-sm">
+            <div class="mod-row__icon" style="margin-bottom:var(--sc-space-3)"><svg><use href="#i-spark"/></svg></div>
+            <h3 class="card__title">Fast by default</h3>
+            <p class="card__desc" style="margin-top:var(--sc-space-2)">Tuned garbage collection, a lean launcher and no bundled browser engine.</p>
+          </div>
+          <div class="card card--pad-sm">
+            <div class="mod-row__icon" style="margin-bottom:var(--sc-space-3)"><svg><use href="#i-users"/></svg></div>
+            <h3 class="card__title">Any account</h3>
+            <p class="card__desc" style="margin-top:var(--sc-space-2)">Sign in with Microsoft, or add a local offline profile for testing.</p>
+          </div>
+          <div class="card card--pad-sm">
+            <div class="mod-row__icon" style="margin-bottom:var(--sc-space-3)"><svg viewBox="0 0 256 256" fill="currentColor" width="18" height="18"><use href="#i-star"/></svg></div>
+            <h3 class="card__title">Star Menu</h3>
+            <p class="card__desc" style="margin-top:var(--sc-space-2)">Preset quality-of-life mods, switchable per instance with conflict checks.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2 -->
+      <div class="wpanel" data-wpanel="2">
+        <h2 style="margin:0 0 var(--sc-space-2)">Pick your look</h2>
+        <p class="muted" style="margin:0 0 var(--sc-space-6)">OLED Black is the signature look: true black panels that stay easy on the eyes at night.</p>
+        <div class="theme-picker" id="wizardThemes"></div>
+        <h3 class="settings__group-title" style="margin:var(--sc-space-7) 0 var(--sc-space-4)">Accent</h3>
+        <div class="accent-picker" id="wizardAccents"></div>
+      </div>
+
+      <!-- 3 -->
+      <div class="wpanel" data-wpanel="3">
+        <h2 style="margin:0 0 var(--sc-space-2)">Sign in</h2>
+        <p class="muted" style="margin:0 0 var(--sc-space-6)">Official Microsoft accounts unlock online multiplayer. Offline profiles are fine for singleplayer.</p>
+        <div class="grid grid--2">
+          <div class="card is-interactive" data-toast="Starting Microsoft device-code sign-in">
+            <div class="inline"><svg width="20" height="20" class="accent"><use href="#i-key"/></svg><h3 class="card__title">Microsoft account</h3></div>
+            <p class="card__desc" style="margin-top:var(--sc-space-3)">Sign in with a code — no password is ever stored by Star Client.</p>
+          </div>
+          <div class="card is-interactive" data-toast="Offline profile created">
+            <div class="inline"><svg width="20" height="20" class="muted"><use href="#i-users"/></svg><h3 class="card__title">Offline profile</h3></div>
+            <p class="card__desc" style="margin-top:var(--sc-space-3)">Choose a username and start playing straight away.</p>
+          </div>
+        </div>
+        <div class="field" style="margin-top:var(--sc-space-6)">
+          <label class="field__label" for="wizardName">Offline username</label>
+          <input class="input" id="wizardName" value="StarKnight" style="max-width:280px">
+        </div>
+      </div>
+
+      <!-- 4 -->
+      <div class="wpanel" data-wpanel="4">
+        <h2 style="margin:0 0 var(--sc-space-2)">Memory and performance</h2>
+        <p class="muted" style="margin:0 0 var(--sc-space-6)">Star Client detected 16 GB of system memory and Java 21 on your machine.</p>
+
+        <div class="card" style="margin-bottom:var(--sc-space-6)">
+          <div class="ram">
+            <div class="ram__top">
+              <div class="ram__value"><span id="wizardRamValue">6144</span><small>MB</small></div>
+              <div class="inline">
+                <button class="btn btn--sm" id="wizardAuto">Auto-tune for me</button>
+              </div>
+            </div>
+            <div class="ram__track">
+              <input type="range" class="range" id="wizardRam" min="512" max="32768" step="256" value="6144">
+            </div>
+            <div class="ram__scale"><span>512 MB</span><span>16 GB</span><span>32 GB</span></div>
+            <div class="ram__quick">
+              <button class="chip" data-ram="2048">2 GB</button>
+              <button class="chip" data-ram="4096">4 GB</button>
+              <button class="chip is-on" data-ram="6144">6 GB</button>
+              <button class="chip" data-ram="8192">8 GB</button>
+            </div>
+          </div>
+        </div>
+
+        <h3 class="settings__group-title">Garbage collector</h3>
+        <div class="radio-cards" id="wizardGc"></div>
+      </div>
+
+      <!-- 5 -->
+      <div class="wpanel" data-wpanel="5">
+        <div class="wizard__hero">
+          <svg class="star" viewBox="0 0 256 256" fill="currentColor"><use href="#i-star"/></svg>
+          <h1>All set</h1>
+          <p>Star Client is configured. Here's what you chose — you can change any of it in Settings.</p>
+        </div>
+        <div class="card" style="max-width:560px;margin:0 auto">
+          <table class="table">
+            <tbody>
+              <tr><td class="muted">Theme</td><td id="sumTheme">OLED Black · Starlight</td></tr>
+              <tr><td class="muted">Account</td><td id="sumAccount">Online (Microsoft)</td></tr>
+              <tr><td class="muted">Memory</td><td id="sumMemory">6144 MB</td></tr>
+              <tr><td class="muted">Collector</td><td id="sumCollector">G1GC</td></tr>
+              <tr><td class="muted">Star Menu</td><td>Enabled</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal__foot">
+      <button class="btn btn--ghost" id="wizardSkip">Skip setup</button>
+      <div class="spacer"></div>
+      <button class="btn" id="wizardBack"><svg><use href="#i-chevron-l"/></svg>Back</button>
+      <button class="btn btn--primary" id="wizardNext">Continue<svg><use href="#i-chevron-r"/></svg></button>
+    </div>
+  </div>
+</div>
+
+<!-- generic card modal -->
+<div class="overlay" id="modalOverlay" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+  <div class="modal modal--sm">
+    <div class="modal__head">
+      <div><h2 id="modalTitle">Create instance</h2><p id="modalDesc">Choose a name and a base version.</p></div>
+      <div class="modal__spacer"></div>
+      <button class="btn btn--ghost btn--icon btn--sm" data-close-modal aria-label="Close"><svg><use href="#i-x"/></svg></button>
+    </div>
+    <div class="modal__body">
+      <div class="field">
+        <label class="field__label" for="newInstName">Instance name</label>
+        <input class="input" id="newInstName" value="New Instance">
+      </div>
+      <div class="field" style="margin-bottom:0">
+        <label class="field__label" for="newInstVer">Minecraft version</label>
+        <select class="select" id="newInstVer">
+          <option>1.21.1 (latest release)</option>
+          <option>1.20.1</option>
+          <option>1.19.2</option>
+          <option>1.8.9</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal__foot">
+      <div class="spacer"></div>
+      <button class="btn" data-close-modal>Cancel</button>
+      <button class="btn btn--primary" data-close-modal data-toast="Instance created">Create</button>
+    </div>
+  </div>
+</div>
+
+<div class="toasts" id="toasts" aria-live="polite"></div>
+
+<script src="js/data.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
