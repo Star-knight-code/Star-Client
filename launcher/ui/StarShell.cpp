@@ -17,6 +17,7 @@
  */
 #include "StarShell.h"
 
+#include <QApplication>
 #include <QEvent>
 #include <QHBoxLayout>
 #include <QIcon>
