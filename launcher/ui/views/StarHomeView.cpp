@@ -98,7 +98,7 @@ StarHomeView::StarHomeView(QWidget* parent) : QWidget(parent)
     auto* row = new QHBoxLayout();
     row->setSpacing(12);
 
-    auto* makeButton = [this](const QString& text, const char* role) {
+    auto makeButton = [this](const QString& text, const char* role) -> QToolButton* {
         auto* button = new QToolButton(this);
         button->setProperty("starRole", QString::fromLatin1(role));
         button->setCursor(Qt::PointingHandCursor);
